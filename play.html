@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <script src="javascript/jquery.js"></script> 
+        <script src="/socket.io/socket.io.js"></script>
+        <!--<script src="javascript/gameplay.js"></script>-->
+
+        <script>
+            var socket = io.connect('http://localhost:4000');
+            var points = 0;
+            var pointsToWin = 10;
+            var screenWidth = 1000;
+            var player = 0;
+            var round = -1;
+            var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
+            var matchNum;
+
+            $(document).ready(function () {
+                //create an onClick event for each <div> in the playing field to remove itself and increment player
+				repositionPlayers();
+                $("#playingField").on("click", "div", function (event) {
+					console.log(this.id);
+                    if (this.id === round + "shape" + 0) {
+                        var timestamp = Date.now();
+                        socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
+                    }
+                    $(this).remove();
+                });
+            });
+
+            socket.on('startGame', function (data) {
+                counter = 3;
+                matchNum = data['matchNum'];
+				player = data['player'];
+				//alert("Match #: " + matchNum + "\nPlayer: " + player);
+                interval = setInterval(function () { startInterval(data['shapes']) }, 1000);
+            });
+
+            function startInterval(shapes) {
+                counter--;
+                if (counter != 0) {
+                    $("#timer").text(counter);
+                }
+                else {
+                    $("#timer").text("Go!");
+                    clearInterval(interval);
+                    newShapes(shapes);
+                }
+            }
+
+            socket.on('newShapes', function (shapes) {
+                newShapes(shapes);
+            });
+
+            function newShapes(shapes) {
+                round++;
+                for (i = 0; i < shapes.length; i++) {
+					var shapeID = "" + round + "shape" + i;
+					//console.log("round: " + round + "\ni: " + i + "\nshapeID: " + shapeID);
+                    $("#playingField").append("<div style='display:block' id ='" + shapeID + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
+					
+                    var randPosX = Math.floor((Math.random() * ($("#playingField").width() - shapes[i]['width'])));
+                    var randPosY = Math.floor((Math.random() * ($("#playingField").height() - shapes[i]['height'])));
+
+                    $("#" + round + "shape" + i).css("width", shapes[i]['width']);
+                    $("#" + round + "shape" + i).css("height", shapes[i]['height']);
+                    $("#" + round + "shape" + i).children().css("width", shapes[i]['width']);
+                    $("#" + round + "shape" + i).children().css("height", shapes[i]['height']);
+                    $("#" + round + "shape" + i).css('left', randPosX);
+                    $("#" + round + "shape" + i).css('top', randPosY);
+                }
+            }
+
+            socket.on('point', function () {
+                points++;
+                repositionPlayers();
+                if (points == pointsToWin) {
+                    socket.emit('win', matchNum);
+                }
+            });
+
+            socket.on('losePoint', function () {
+                points--;
+                repositionPlayers();
+            });
+
+            function repositionPlayers() {
+                if (player == 1) {
+                    var left = (screenWidth / 4) - ((screenWidth / (pointsToWin * 4)) * points);
+                    $("#player1").css('left', left);
+                    $("#player2").css('left', left + (screenWidth / 2));
+                }
+                else {
+                    var left = ((screenWidth / 4) * 3) + ((screenWidth / (pointsToWin * 4)) * points);
+                    $("#player2").css('left', left);
+                    $("#player1").css('left', left - (screenWidth / 2));
+                }
+            }
+
+            socket.on('win', function () {
+                alert("You win!!");
+            });
+
+            socket.on('lose', function () {
+                alert("You lost :(");
+            });
+        </script>
+        
+        <link rel="StyleSheet" href="css/styles.css" />
+    </head>
+    <body>
+        <p id="timer">3</p>
+        <div id ="targetShape"></div>
+        <div id="playingField"></div>
+        <div id="scoreBoard">
+            <div class="player" id="player1">Player 1</div>
+            <div class="player" id="player2">Player 2</div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="utf-8" />
+    <title>Untitled-1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Normal">
+    <link rel="StyleSheet" href="css/styles.css" />
+    <script src="javascript/jquery.js"></script> 
+    <!-- Add your custom HEAD content here -->
+
+</head>
+<body>
+    <div id="content-container">
+
+        <div id="artboard_1">
+            <div id="layer_1"></div>
+            <div id="able_wars_">
+                ABLE WARS!
+            </div>
+           <!-- <div class="mainBtn warBtn" id="rounded_rectangle_1">
+            </div>
+            <div class="txtBtn warBtn" id="go_to_war">
+                Go To War
+            </div>
+            <div class="mainBtn settingsBtn" id="rounded_rectangle_1_copy"></div>
+            <div class="txtBtn settingsBtn" id="settings">
+                Settings
+            </div>
+              <div class="mainBtn profileBtn" id="rounded_rectangle_1_copy_2"></div>
+           
+            <div class="txtBtn profileBtn" id="profile">
+                Profile
+            </div>-->
+            <div id="artboard_1">
+                <a href="play.html"><div class="mainBtn warBtn" id="go_to_war"></div></a>
+                <a href="profile.html"><div class="mainBtn profileBtn" id="profile"></div></a>
+                <a href="settings.html"><div class="mainBtn settingsBtn" id="settings"></div></a>
+            </div>
+            
+            
+
+        </div>
+
+    </div>
+</body>
+</html>
+<script>
+  /*  $(".mainBtn").draggable()
+    $(".mainBtn").(function () {
+        if ($(this).hasClass("warBtn")) {
+            if($(this).hasClass("warClick"))
+                $(this).removeClass("warClick")
+        }
+        else if ($(this).hasClass("settingsBtn")) {
+            if($(this).hasClass("settingsClick"))
+                $(this).removeClass("settingsClick")            
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            if($(this).hasClass("profileClick"))
+                $(this).removeClass("profileClick")      
+        }
+    });*/
+    $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("warBtn")) {
+            $(this).addClass("warClick");
+            GoToWar();
+        }
+        else if ($(this).hasClass("settingsBtn")) {
+            $(this).addClass("settingsClick");
+            GoToSettings();
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            $(this).addClass("profileClick");
+            GoToProfile();
+        }
+    });
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("warBtn")) {
+            $(this).removeClass("warClick");
+        }
+        else if ($(this).hasClass("settingsBtn")) {
+            $(this).removeClass("settingsClick");
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            $(this).removeClass("profileClick");
+        }
+    })
+
+    function GoToWar() {
+        //go to next page
+    }
+ 
+    function GoToProfile() {
+
+    }
+
+    function GoToSettings() {
+
+    }
+</script>

@@ -23,10 +23,12 @@
 				repositionPlayers();
                 $("#playingField").on("click", "div", function (event) {
 					console.log(this.id);
-                    if (this.id === round + "shape" + 0) {
+                    /*if (this.id === round + "shape" + 0) {
                         var timestamp = Date.now();
                         socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
-                    }
+                    }*/
+					var timestamp = Date.now();
+					socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
                     $(this).remove();
                 });
             });

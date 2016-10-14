@@ -45,7 +45,7 @@ public partial class _Default : Page
                 if (pass == txtPass.Text)
                 {
                     Session["user"] = txtUser.Text;
-                    Response.Redirect("index.html");
+                    Response.Redirect("HtmlPage.html");
                 }
                 else
                 {

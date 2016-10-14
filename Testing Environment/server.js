@@ -36,6 +36,7 @@ server.listen(4000, function () {
 });
 
 io.on('connection', function (socket) {
+	console.log("client connected");
     if (!clientWaiting) {
         clientWaiting = true;
         waitingSocket = socket;
@@ -102,7 +103,7 @@ io.on('connection', function (socket) {
 });
 
 function getShapes() {
-    var shapeCount = Math.round(Math.random() * 10);
+    var shapeCount = 1 + Math.round(Math.random() * 10);
 	//var shapeCount = 1;
     var shapes = [];
     for (var i = 0; i < shapeCount; i++) {

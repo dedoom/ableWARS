@@ -10,12 +10,13 @@
         <script>
             var socket = io.connect('http://localhost:4000');
             var points = 0;
-            var pointsToWin = 10;
+            var pointsToWin = 3;
             var screenWidth = 1000;
             var player = 0;
             var round = -1;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var matchNum;
+			var interval;
 
             $(document).ready(function () {
                 //create an onClick event for each <div> in the playing field to remove itself and increment player
@@ -59,10 +60,18 @@
                 for (i = 0; i < shapes.length; i++) {
 					var shapeID = "" + round + "shape" + i;
 					//console.log("round: " + round + "\ni: " + i + "\nshapeID: " + shapeID);
-                    $("#playingField").append("<div style='display:block' id ='" + shapeID + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
+					var hSpeed = Math.floor(($('#playingField').width() / 400) + (Math.random() * ($('#playingField').width() / 400)));
+					if (Math.round(Math.random())){
+						hSpeed *= -1;
+					}
+					var vSpeed = Math.floor(($('#playingField').height() / 300) + (Math.random() * ($('#playingField').height() / 300)));
+                    if (Math.round(Math.random())){
+						vSpeed *= -1;
+					}
+					$("#playingField").append("<div style='display:block' id ='" + shapeID + "' data-hSpeed='" + hSpeed + "' data-vSpeed='" + vSpeed + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
 					
-                    var randPosX = Math.floor((Math.random() * ($("#playingField").width() - shapes[i]['width'])));
-                    var randPosY = Math.floor((Math.random() * ($("#playingField").height() - shapes[i]['height'])));
+                    var randPosX = Math.floor(Math.random() * ($("#playingField").width() - shapes[i]['width']));
+                    var randPosY = Math.floor(Math.random() * ($("#playingField").height() - shapes[i]['height']));
 
                     $("#" + round + "shape" + i).css("width", shapes[i]['width']);
                     $("#" + round + "shape" + i).css("height", shapes[i]['height']);
@@ -71,7 +80,24 @@
                     $("#" + round + "shape" + i).css('left', randPosX);
                     $("#" + round + "shape" + i).css('top', randPosY);
                 }
+				interval = setInterval(function (){ moveShapes() }, 50);
             }
+			
+			function moveShapes(){
+				var shapes = $('#playingField').children();
+				for (var i = 0; i < shapes.length; i++){
+					//console.log($(shapes[i]).id + "\n" + $(shapes[i]).css('left') + "\n" + $(shapes[i]).css('top'));
+					if (parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')) < 0 || parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')) > $('#playingField').width() - parseInt($(shapes[i]).css('width'))){
+						shapes[i].setAttribute('data-hSpeed', -1 * parseInt(shapes[i].getAttribute('data-hSpeed')));
+					}
+					if (parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')) < 0 || parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')) > $('#playingField').height() - parseInt($(shapes[i]).css('height'))){
+						shapes[i].setAttribute('data-vSpeed', -1 * parseInt(shapes[i].getAttribute('data-vSpeed')));
+					}
+					//console.log(parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')));
+					$(shapes[i]).css('left', parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')));
+					$(shapes[i]).css('top', parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')));
+				}
+			}
 
             socket.on('point', function () {
                 points++;
@@ -100,11 +126,13 @@
             }
 
             socket.on('win', function () {
-                alert("You win!!");
+                clearInterval(interval);
+				alert("You win!!");
             });
 
             socket.on('lose', function () {
-                alert("You lost :(");
+                clearInterval(interval);
+				alert("You lost :(");
             });
         </script>
         

@@ -28,7 +28,7 @@
                         socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
                     }*/
 					var timestamp = Date.now();
-					socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
+					socket.emit('shapeClick', { matchNum: matchNum, timeStamp: timestamp });
                     $(this).remove();
                 });
             });

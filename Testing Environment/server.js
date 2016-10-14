@@ -88,6 +88,23 @@ io.on('connection', function (socket) {
         }
     });
 
+	socket.on('shapeClick', function (data) {
+		//console.log(data['matchNum']);
+        var match = matches[data['matchNum']];
+        var player = 0, opponent = 0;
+        if (match['player1']['socket'] == socket){
+            player = 1;
+            opponent = 2;
+        }
+        else {
+            player = 2;
+            opponent = 1;
+        }
+		//console.log("player: " + player + "  opponent: " + opponent);
+        socket.emit('point');
+        match['player' + opponent]['socket'].emit('losePoint');
+    });
+	
     socket.on('win', function (matchNum) {
         var opponent = 0;
 		var match = matches[matchNum];

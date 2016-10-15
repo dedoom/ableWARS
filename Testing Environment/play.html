@@ -8,15 +8,19 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var socket = io.connect('http://localhost:4000');
+			var homePageURL = "http://localhost:4000";
+            var socket = io.connect(homePageURL);
             var points = 0;
             var pointsToWin = 3;
             var screenWidth = 1000;
             var player = 0;
             var round = -1;
+			var timeRemaining = 10;
+			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
-            var matchNum;
-			var interval;
+            var matchID;
+			var interval1, interval2;
+			var playerID;
 
             $(document).ready(function () {
                 //create an onClick event for each <div> in the playing field to remove itself and increment player
@@ -25,20 +29,29 @@
 					console.log(this.id);
                     /*if (this.id === round + "shape" + 0) {
                         var timestamp = Date.now();
-                        socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
+                        socket.emit('targetShapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
                     }*/
 					var timestamp = Date.now();
-					socket.emit('shapeClick', { matchNum: matchNum, timeStamp: timestamp });
+					var sID = this.id;
+					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
                     $(this).remove();
                 });
             });
 
+			socket.on('connect', function(){
+				socket.on('disconnect', function(){
+					console.log("i have been disconnected from the server.");
+					window.location.replace(homePageURL);
+				});
+			});
+			
             socket.on('startGame', function (data) {
                 counter = 3;
-                matchNum = data['matchNum'];
+                matchID = data['matchID'];
 				player = data['player'];
-				//alert("Match #: " + matchNum + "\nPlayer: " + player);
-                interval = setInterval(function () { startInterval(data['shapes']) }, 1000);
+				playerID = data['playerID'];
+				//alert("Match #: " + matchID + "\nPlayer: " + player);
+                interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
             });
 
             function startInterval(shapes) {
@@ -48,10 +61,24 @@
                 }
                 else {
                     $("#timer").text("Go!");
-                    clearInterval(interval);
+                    clearInterval(interval1);
                     newShapes(shapes);
+					interval2 = setInterval(function(){ countDown() }, 1000);
                 }
             }
+			
+			function countDown(){
+				$("#timer").text(timeRemaining);
+				timeRemaining--;
+				if (timeRemaining < 0){
+					socket.emit('timeUp', { matchID: matchID, score: points });
+					clearInterval(interval2);
+				}
+				else if (timeRemaining % shapeRequestInterval == 0){
+					console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
+					socket.emit('shapesRequest');
+				}
+			}
 
             socket.on('newShapes', function (shapes) {
                 newShapes(shapes);
@@ -82,7 +109,7 @@
                     $("#" + round + "shape" + i).css('left', randPosX);
                     $("#" + round + "shape" + i).css('top', randPosY);
                 }
-				interval = setInterval(function (){ moveShapes() }, 50);
+				interval1 = setInterval(function (){ moveShapes() }, 50);
             }
 			
 			function moveShapes(){
@@ -105,14 +132,24 @@
                 points++;
                 repositionPlayers();
                 if (points == pointsToWin) {
-                    socket.emit('win', matchNum);
+                    socket.emit('win', matchID);
                 }
             });
-
-            socket.on('losePoint', function () {
-                points--;
+			
+            socket.on('losePoint', function (shapeID) {
+                removeShape(shapeID);
+				points--;
                 repositionPlayers();
             });
+			
+			function removeShape(shapeID){
+				var shapes = $('#playingField').children();
+				for (var s = 0; s < shapes.length; s++){
+					if (shapes[s].id == shapeID){
+						$(shapes[s]).remove();
+					}
+				}
+			}
 
             function repositionPlayers() {
                 if (player == 1) {
@@ -128,14 +165,34 @@
             }
 
             socket.on('win', function () {
-                clearInterval(interval);
+                clearInterval(interval1);
 				alert("You win!!");
+				window.location.replace(homePageURL);
             });
 
-            socket.on('lose', function () {
-                clearInterval(interval);
+            socket.on('winByDisconnect', function(){
+				clearInterval(interval1);
+				alert("You're opponent has disconnected from the match.\nYou win!!");
+				window.location.replace(homePageURL);
+			});
+			
+			socket.on('lose', function () {
+                clearInterval(interval1);
 				alert("You lost :(");
+				window.location.replace(homePageURL);
             });
+			
+			socket.on('tie', function(){
+				clearInterval(interval1);
+				alert("You've tied with your opponent.");
+				window.location.replace(homePageURL);
+			});
+			
+			/*socket.on('updatematchID', function(newmatchID){
+				matchID = newmatchID;
+			});*/
+			
+			
         </script>
         
         <link rel="StyleSheet" href="css/styles.css" />

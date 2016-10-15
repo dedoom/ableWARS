@@ -24,6 +24,10 @@ var clientWaiting = false;
 var waitingSocket;
 var matches = [];
 var numOfMatches = 0;
+var waitingPlayerID;
+var newShapes;
+var needNewShapes = true;
+var shapesPerRequest = 5;
 
 app.use(express.static(path.join(__dirname + '/')));
 
@@ -40,21 +44,49 @@ io.on('connection', function (socket) {
     if (!clientWaiting) {
         clientWaiting = true;
         waitingSocket = socket;
+		waitingPlayerID = Date.now();
     }
     else {
-        clientWaiting = false;
-        var match = { matchNum: numOfMatches, player1: { socket: waitingSocket, targetTimestamp: 0 }, player2: { socket: socket, targetTimestamp: 0 } }
-        matches.push(match);
+		var player2ID = Date.now();
+        var match = { matchID: "match:" + waitingPlayerID + ":" + player2ID, player1: { playerID: waitingPlayerID, socket: waitingSocket, targetTimestamp: 0 }, player2: { playerID: player2ID, socket: socket, targetTimestamp: 0 }, higherScore: -1 };
+		matches.push(match);
         numOfMatches++;
 
         var shapes = getShapes();
-        socket.emit('startGame', { matchNum: match['matchNum'], shapes: shapes, player: 2 });
-        waitingSocket.emit('startGame', { matchNum: match['matchNum'], shapes: shapes, player: 1 });
+        socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, player: 2, playerID: player2ID });
+        waitingSocket.emit('startGame', { matchID: match['matchID'], shapes: shapes, player: 1, playerID: waitingPlayerID });
+		
+		waitingSocket = null;
+		clientWaiting = false;
+		waitingPlayerID = null;
     }
+	
+	socket.on('disconnect', function(){
+		console.log("client disconnected");
+		if (socket == waitingSocket){
+			console.log("waiting socket client disconnected");
+			clientWaiting = false;
+			waitingSocket = null;
+		}
+		else {
+			for (var m = 0; m < matches.length; m++){
+				if (matches[m]['player1']['socket'] == socket){
+					console.log("match found after spliced!");
+					matches[m]['player2']['socket'].emit('winByDisconnect');
+					matches.splice(m, 1);
+				}
+				else if (matches[m]['player2']['socket'] == socket){
+					console.log("match found after spliced!");
+					matches[m]['player1']['socket'].emit('winByDisconnect');
+					matches.splice(m, 1);
+				}
+			}
+		}
+	});
 
     socket.on('targetShapeClick', function (data) {
-		//console.log(data['matchNum']);
-        var match = matches[data['matchNum']];
+		//console.log(data['matchID']);
+        var match = getMatchByID(data['matchID']);
         var player = 0, opponent = 0;
         if (match['player1']['socket'] == socket){
             player = 1;
@@ -73,11 +105,11 @@ io.on('connection', function (socket) {
 			//console.log("second");
             if (match['player' + player]['targetTimestamp'] < match['player' + opponent]['targetTimestamp']) {
                 socket.emit('point');
-                match['player' + opponent]['socket'].emit('losePoint');
+                match['player' + opponent]['socket'].emit('losePoint', data['shapeID']);
             }
             else {
                 match['player' + opponent]['socket'].emit('point');
-                socket.emit('losePoint');
+                socket.emit('losePoint', data['shapeID']);
             }
             var shapes = getShapes();
             socket.emit('newShapes', shapes);
@@ -87,10 +119,21 @@ io.on('connection', function (socket) {
             match['player' + opponent]['targetTimestamp'] = 0;
         }
     });
+	
+	socket.on('shapesRequest', function(){
+		if (needNewShapes){
+			newShapes = getShapes();
+			needNewShapes = false;
+		}
+		else {
+			needNewShapes = true;
+		}
+        socket.emit('newShapes', newShapes);
+	});
 
 	socket.on('shapeClick', function (data) {
-		//console.log(data['matchNum']);
-        var match = matches[data['matchNum']];
+		//console.log(data['matchID']);
+        var match = getMatchByID(data['matchID']);
         var player = 0, opponent = 0;
         if (match['player1']['socket'] == socket){
             player = 1;
@@ -102,12 +145,46 @@ io.on('connection', function (socket) {
         }
 		//console.log("player: " + player + "  opponent: " + opponent);
         socket.emit('point');
-        match['player' + opponent]['socket'].emit('losePoint');
+        match['player' + opponent]['socket'].emit('losePoint', data['shapeID']);
     });
 	
-    socket.on('win', function (matchNum) {
+	socket.on('timeUp', function(data){
+		var matchIndex = getIndexOfMatchByID(data['matchID']);
+		var match = getMatchByID(data['matchID']);
+		var score = data['score'];
+		//console.log("matchIndex = " + matchIndex + "\nhigherScore = " + parseInt(matches[matchIndex]['higherScore']) + "\nscore = " + score);
+		if (parseInt(matches[matchIndex]['higherScore']) < 0){
+			matches[matchIndex]['higherScore'] = score;
+		}
+		else {
+			var opponent = 0;
+			if (match['player1']['socket'] == socket) {
+				opponent = 2;
+			}
+			else {
+				opponent = 1;
+			}
+			if (score > parseInt(matches[matchIndex]['higherScore'])){
+				match['player' + opponent]['socket'].emit('lose');
+				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
+				socket.emit('win');
+			}
+			else if (score < parseInt(matches[matchIndex]['higherScore'])){
+				match['player' + opponent]['socket'].emit('win');
+				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
+				socket.emit('lose');
+			}
+			else {
+				match['player' + opponent]['socket'].emit('tie');
+				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
+				socket.emit('tie');
+			}
+		}
+	});
+	
+    socket.on('win', function (matchID) {
         var opponent = 0;
-		var match = matches[matchNum];
+		var match = getMatchByID(matchID);
         if (match['player1']['socket'] == socket) {
             opponent = 2;
         }
@@ -116,11 +193,30 @@ io.on('connection', function (socket) {
         }
         socket.emit('win');
         match['player' + opponent]['socket'].emit('lose');
+		matches.splice(getIndexOfMatchByID(matchID), 1);
     });
 });
 
+function getMatchByID(matchID){
+	for (var m = 0; m < matches.length; m++){
+		if (matches[m]['matchID'] == matchID){
+			return matches[m];
+		}
+	}
+	return null;
+}
+
+function getIndexOfMatchByID(matchID){
+	for (var m = 0; m < matches.length; m++){
+		if (matches[m]['matchID'] == matchID){
+			return m;
+		}
+	}
+	return null;
+}
+
 function getShapes() {
-    var shapeCount = 1 + Math.round(Math.random() * 10);
+    var shapeCount = 1 + Math.round(Math.random() * shapesPerRequest);
 	//var shapeCount = 1;
     var shapes = [];
     for (var i = 0; i < shapeCount; i++) {

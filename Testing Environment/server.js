@@ -71,14 +71,14 @@ io.on('connection', function (socket) {
 		else {
 			for (var m = 0; m < matches.length; m++){
 				if (matches[m]['player1']['socket'] == socket){
-					console.log("match found after spliced!");
 					matches[m]['player2']['socket'].emit('winByDisconnect');
 					matches.splice(m, 1);
+					console.log("match found after spliced!");
 				}
 				else if (matches[m]['player2']['socket'] == socket){
-					console.log("match found after spliced!");
 					matches[m]['player1']['socket'].emit('winByDisconnect');
 					matches.splice(m, 1);
+					console.log("match found after spliced!");
 				}
 			}
 		}
@@ -229,7 +229,7 @@ function getShapes() {
 function getNewShape(i) {
     var id = i;
     var picker = Math.floor((Math.random() * 12));
-    var width = 40 + Math.floor((Math.random() * 110));
+    var height = 40 + Math.floor((Math.random() * 110));
 
-    return { id: id, picker: picker, width: width};
+    return { id: id, picker: picker, height: height};
 }

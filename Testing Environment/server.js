@@ -122,8 +122,8 @@ io.on('connection', function (socket) {
 	
 	socket.on('shapesRequest', function(){
 		if (needNewShapes){
-			newShapes = getShapes();
 			needNewShapes = false;
+			newShapes = getShapes();
 		}
 		else {
 			needNewShapes = true;

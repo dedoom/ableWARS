@@ -229,8 +229,7 @@ function getShapes() {
 function getNewShape(i) {
     var id = i;
     var picker = Math.floor((Math.random() * 12));
-    var width = Math.floor((Math.random() * 200));
-    var height = Math.floor((Math.random() * 200));
+    var width = 40 + Math.floor((Math.random() * 110));
 
-    return { id: id, picker: picker, width: width, height: height};
+    return { id: id, picker: picker, width: width};
 }

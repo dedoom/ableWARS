@@ -11,20 +11,21 @@
 			var homePageURL = "http://localhost:4000";
             var socket = io.connect(homePageURL);
             var points = 0;
-            var pointsToWin = 3;
-            var screenWidth = 1000;
-            var player = 0;
+            var pointsToWin = 10;
+            var player = 1;
             var round = -1;
-			var timeRemaining = 10;
+			var timeRemaining = 60;
 			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
-            var matchID;
+            var shapeHeightRatios = [0.5, 1, 1, 0.5, 1, 1, 0.5, 1, 1, 0.5, 1, 1];
+			var matchID;
 			var interval1, interval2;
 			var playerID;
+			var browserWidth, browserHeight;
 
             $(document).ready(function () {
                 //create an onClick event for each <div> in the playing field to remove itself and increment player
-				repositionPlayers();
+				sizeComponentsToBrowser();
                 $("#playingField").on("click", "div", function (event) {
 					console.log(this.id);
                     /*if (this.id === round + "shape" + 0) {
@@ -37,6 +38,22 @@
                     $(this).remove();
                 });
             });
+			
+			$(window).resize(function(){
+				sizeComponentsToBrowser();
+			});
+			
+			function sizeComponentsToBrowser(){
+				browserWidth = $(window).width();
+				browserHeight = $(window).height();
+				//resize
+				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#player1').outerHeight(true)));
+				$('#timer').css('margin-top', parseInt($('#timer').css('margin-bottom')));
+				$('#playingField').css("height", browserHeight - parseInt($('#timer').outerHeight(true)) - parseInt($('#player1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
+				//console.log("playingField height: " + $('#playingField').height());
+				$('#timer').css('margin-top', parseInt($('#timer').height()) / 2);
+				repositionPlayers();
+			}
 
 			socket.on('connect', function(){
 				socket.on('disconnect', function(){
@@ -75,7 +92,7 @@
 					clearInterval(interval2);
 				}
 				else if (timeRemaining % shapeRequestInterval == 0){
-					console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
+					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
 					socket.emit('shapesRequest');
 				}
 			}
@@ -97,15 +114,15 @@
                     if (Math.round(Math.random())){
 						vSpeed *= -1;
 					}
-					$("#playingField").append("<div style='display:block' id ='" + shapeID + "' data-hSpeed='" + hSpeed + "' data-vSpeed='" + vSpeed + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
+					$("#playingField").append("<div style='display:block' class='shape' id ='" + shapeID + "' data-hSpeed='" + hSpeed + "' data-vSpeed='" + vSpeed + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
 					
                     var randPosX = Math.floor(Math.random() * ($("#playingField").width() - shapes[i]['width']));
                     var randPosY = Math.floor(Math.random() * ($("#playingField").height() - shapes[i]['height']));
 
                     $("#" + round + "shape" + i).css("width", shapes[i]['width']);
-                    $("#" + round + "shape" + i).css("height", shapes[i]['height']);
+                    $("#" + round + "shape" + i).css("height", shapes[i]['width'] * shapeHeightRatios[shapes[i]['picker']]);
                     $("#" + round + "shape" + i).children().css("width", shapes[i]['width']);
-                    $("#" + round + "shape" + i).children().css("height", shapes[i]['height']);
+                    $("#" + round + "shape" + i).children().css("height", shapes[i]['width'] * shapeHeightRatios[shapes[i]['picker']]);
                     $("#" + round + "shape" + i).css('left', randPosX);
                     $("#" + round + "shape" + i).css('top', randPosY);
                 }
@@ -152,15 +169,19 @@
 			}
 
             function repositionPlayers() {
-                if (player == 1) {
-                    var left = (screenWidth / 4) - ((screenWidth / (pointsToWin * 4)) * points);
+                console.log(browserWidth);
+				if (player == 1) {
+					//console.log("browserWidth: " + browserWidth + "\npos by points: " + ((browserWidth / (pointsToWin * 4)) * points) + "\nposition" + parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points)));
+                    //var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player1').width()) / 2));
+					var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points));
                     $("#player1").css('left', left);
-                    $("#player2").css('left', left + (screenWidth / 2));
+                    $("#player2").css('left', left + (browserWidth / 2) - parseInt($('#player1').width()));
                 }
                 else {
-                    var left = ((screenWidth / 4) * 3) + ((screenWidth / (pointsToWin * 4)) * points);
+                    //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player2').width()) / 2));
+					var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - parseInt($('#player2').width()));
                     $("#player2").css('left', left);
-                    $("#player1").css('left', left - (screenWidth / 2));
+                    $("#player1").css('left', left - (browserWidth / 2) + parseInt($('#player2').width()));
                 }
             }
 

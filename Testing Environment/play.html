@@ -8,14 +8,14 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-			var homePageURL = "http://10.16.26.135:4000";
+			var homePageURL = "http://192.168.1.102:4000";
             var socket = io.connect(homePageURL);
             var points = 0;
             var pointsToWin = 10;
             var player = 1;
             var round = -1;
 			var timeRemaining = 60;
-			var shapeRequestInterval = 15;
+			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
 			var matchID;
@@ -29,7 +29,7 @@
 				sizeComponentsToBrowser();
 				lastPlayingFieldWidth = $('#playingField').width();
 				lastPlayingFieldHeight = $('#playingField').height();
-                $("#playingField").on("click", "div", function (event) {
+                $("#playingField").on("mousedown", "div", function (event) {
 					console.log(this.id);
                     /*if (this.id === round + "shape" + 0) {
                         var timestamp = Date.now();
@@ -37,8 +37,8 @@
                     }*/
 					var timestamp = Date.now();
 					var sID = this.id;
+					$(this).remove();
 					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
-                    $(this).remove();
                 });
             });
 			
@@ -84,7 +84,7 @@
 					//shapes[s].setAttribute('data-vSpeed', shapes[s].getAttribute('data-vSpeedRatio') * ($('#playingField').height() / 200));
 					//playingField w/h  /  last playingField w/h  *  shapes' x/y
 					//console.log("playingField width: " + $('#playingField').width() + "\nlast playingField width: " + lastPlayingFieldWidth + "\nratio: " + ($('#playingField').width() / lastPlayingFieldWidth));
-					console.log("shapeLeftPercent: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) + "\nshape's left: " + $(shapes[s]).css('left') + "\nshape's new left: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
+					//console.log("shapeLeftPercent: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) + "\nshape's left: " + $(shapes[s]).css('left') + "\nshape's new left: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
 					$(shapes[s]).css('left', (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
 					$(shapes[s]).css('top', (parseInt($(shapes[s]).css('top')) / lastPlayingFieldHeight) * $('#playingField').height());
 				}

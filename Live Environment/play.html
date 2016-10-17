@@ -8,34 +8,104 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var socket = io.connect('http://localhost:4000');
+            var homePageURL = "http://localhost:4000";
+            var socket = io.connect(homePageURL);
             var points = 0;
             var pointsToWin = 10;
-            var screenWidth = 1000;
-            var player = 0;
+            var player = 1;
             var round = -1;
+			var timeRemaining = 60;
+			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
-            var matchNum;
+            var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
+			var matchID;
+			var interval1, interval2;
+			var playerID;
+			var browserWidth, browserHeight;
+			var lastPlayingFieldWidth, lastPlayingFieldHeight;
 
             $(document).ready(function () {
                 //create an onClick event for each <div> in the playing field to remove itself and increment player
-				repositionPlayers();
-                $("#playingField").on("click", "div", function (event) {
+				sizeComponentsToBrowser();
+				lastPlayingFieldWidth = $('#playingField').width();
+				lastPlayingFieldHeight = $('#playingField').height();
+                $("#playingField").on("mousedown", "div", function (event) {
 					console.log(this.id);
-                    if (this.id === round + "shape" + 0) {
+                    /*if (this.id === round + "shape" + 0) {
                         var timestamp = Date.now();
-                        socket.emit('targetShapeClick', { matchNum: matchNum, timeStamp: timestamp });
-                    }
-                    $(this).remove();
+                        socket.emit('targetShapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
+                    }*/
+					var timestamp = Date.now();
+					var sID = this.id;
+					$(this).remove();
+					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
                 });
             });
+			
+			$(window).resize(function(){
+				sizeComponentsToBrowser();
+			});
+			
+			function sizeComponentsToBrowser(){
+				browserWidth = $(window).width();
+				browserHeight = $(window).height();
+				//resize
+				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#player1').outerHeight(true)));
+				$('#timer').css('margin-top', parseInt($('#timer').css('margin-bottom')));
+				$('#playingField').css("height", browserHeight - parseInt($('#timer').outerHeight(true)) - parseInt($('#player1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
+				//console.log("playingField height: " + $('#playingField').height());
+				$('#timer').css('margin-top', parseInt($('#timer').height()) / 2);
+				repositionPlayers();
+				var shapes = $('#playingField').children();
+				var fieldDimension;
+				//console.log("playingField height: " + parseInt($('#playingField').height()) + "\nplayingField width: " + $('#playingField').width());
+				if ($('#playingField').height() < $('#playingField').width()){
+					fieldDimension = $('#playingField').height() / 5;
+					for (var s = 0; s < shapes.length; s++){
+						$(shapes[s]).css('height', parseFloat(shapes[s].getAttribute('data-hRatio')) * fieldDimension);
+						$(shapes[s]).children().css('height', $(shapes[s]).height());
+						//console.log("playingFieldHeight: " + $('#playingField').height() + "\nShapeHeightTarget: " + parseFloat(shapes[s].getAttribute('data-hRatio')) * ($('#playingField').height() / 5) + "\nShapeHeight: " + $(shapes[s]).height());
+						$(shapes[s]).css('width', $(shapes[s]).height() * shapeWidthRatios[shapes[s].getAttribute('data-picker')]);
+						$(shapes[s]).children().css('width', $(shapes[s]).width());
+					}
+				}
+				else {
+					fieldDimension = $('#playingField').width() / 5;
+					for (var s = 0; s < shapes.length; s++){
+						$(shapes[s]).css('width', parseFloat(shapes[s].getAttribute('data-wRatio')) * fieldDimension);
+						$(shapes[s]).children().css('width', $(shapes[s]).width());
+						//console.log("playingFieldHeight: " + $('#playingField').height() + "\nShapeHeightTarget: " + parseFloat(shapes[s].getAttribute('data-hRatio')) * ($('#playingField').height() / 5) + "\nShapeHeight: " + $(shapes[s]).height());
+						$(shapes[s]).css('height', $(shapes[s]).width() / shapeWidthRatios[shapes[s].getAttribute('data-picker')]);
+						$(shapes[s]).children().css('height', $(shapes[s]).height());
+					}
+				}
+				for (var s = 0; s < shapes.length; s++){
+					//shapes[s].setAttribute('data-hSpeed', shapes[s].getAttribute('data-hSpeedRatio') * ($('#playingField').width() / 200));
+					//shapes[s].setAttribute('data-vSpeed', shapes[s].getAttribute('data-vSpeedRatio') * ($('#playingField').height() / 200));
+					//playingField w/h  /  last playingField w/h  *  shapes' x/y
+					//console.log("playingField width: " + $('#playingField').width() + "\nlast playingField width: " + lastPlayingFieldWidth + "\nratio: " + ($('#playingField').width() / lastPlayingFieldWidth));
+					//console.log("shapeLeftPercent: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) + "\nshape's left: " + $(shapes[s]).css('left') + "\nshape's new left: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
+					$(shapes[s]).css('left', (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
+					$(shapes[s]).css('top', (parseInt($(shapes[s]).css('top')) / lastPlayingFieldHeight) * $('#playingField').height());
+				}
+				lastPlayingFieldWidth = $('#playingField').width();
+				lastPlayingFieldHeight = $('#playingField').height();
+			}
 
+			socket.on('connect', function(){
+				socket.on('disconnect', function(){
+					console.log("i have been disconnected from the server.");
+					window.location.replace(homePageURL);
+				});
+			});
+			
             socket.on('startGame', function (data) {
                 counter = 3;
-                matchNum = data['matchNum'];
+                matchID = data['matchID'];
 				player = data['player'];
-				//alert("Match #: " + matchNum + "\nPlayer: " + player);
-                interval = setInterval(function () { startInterval(data['shapes']) }, 1000);
+				playerID = data['playerID'];
+				//alert("Match #: " + matchID + "\nPlayer: " + player);
+                interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
             });
 
             function startInterval(shapes) {
@@ -45,10 +115,24 @@
                 }
                 else {
                     $("#timer").text("Go!");
-                    clearInterval(interval);
+                    clearInterval(interval1);
                     newShapes(shapes);
+					interval2 = setInterval(function(){ countDown() }, 1000);
                 }
             }
+			
+			function countDown(){
+				$("#timer").text(timeRemaining);
+				timeRemaining--;
+				if (timeRemaining <= 0){
+					socket.emit('timeUp', { matchID: matchID, score: points });
+					clearInterval(interval2);
+				}
+				else if (timeRemaining % shapeRequestInterval == 0){
+					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
+					socket.emit('shapesRequest');
+				}
+			}
 
             socket.on('newShapes', function (shapes) {
                 newShapes(shapes);
@@ -59,53 +143,130 @@
                 for (i = 0; i < shapes.length; i++) {
 					var shapeID = "" + round + "shape" + i;
 					//console.log("round: " + round + "\ni: " + i + "\nshapeID: " + shapeID);
-                    $("#playingField").append("<div style='display:block' id ='" + shapeID + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
-					
-                    var randPosX = Math.floor((Math.random() * ($("#playingField").width() - shapes[i]['width'])));
-                    var randPosY = Math.floor((Math.random() * ($("#playingField").height() - shapes[i]['height'])));
+					var hSpeed = Math.floor(($('#playingField').width() / 400) + (Math.random() * ($('#playingField').width() / 400)));
+					if (Math.round(Math.random())){
+						hSpeed *= -1;
+					}
+					var vSpeed = Math.floor(($('#playingField').height() / 300) + (Math.random() * ($('#playingField').height() / 300)));
+                    if (Math.round(Math.random())){
+						vSpeed *= -1;
+					}
+					var heightRatio = shapes[i]['height'] / 150;
+					var widthRatio = (shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']]) / 150;
+					var hSpeedRatio = hSpeed / ($('#playingField').width() / 200);
+					var vSpeedRatio = vSpeed / ($('#playingField').height() / 200);
+					$("#playingField").append("<div style='display:block' class='shape' id ='" + shapeID + "' data-hSpeed='" + hSpeed + "' data-vSpeed='" + vSpeed + "' data-hRatio='" + heightRatio + "' data-wRatio='" + widthRatio + "' data-hSpeedRatio='" + hSpeedRatio + "' data-vSpeedRatio='" + vSpeedRatio + "' data-picker='" + shapes[i]['picker'] + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
+					//console.log(document.getElementById(shapeID).getAttribute('data-hRatio'));
+                    var randPosX = Math.floor(Math.random() * ($("#playingField").width() - (shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']])));
+                    var randPosY = Math.floor(Math.random() * ($("#playingField").height() - shapes[i]['height']));
 
-                    $("#" + round + "shape" + i).css("width", shapes[i]['width']);
+                    $("#" + round + "shape" + i).css("width", shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']]);
                     $("#" + round + "shape" + i).css("height", shapes[i]['height']);
-                    $("#" + round + "shape" + i).children().css("width", shapes[i]['width']);
+                    $("#" + round + "shape" + i).children().css("width", shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']]);
                     $("#" + round + "shape" + i).children().css("height", shapes[i]['height']);
                     $("#" + round + "shape" + i).css('left', randPosX);
                     $("#" + round + "shape" + i).css('top', randPosY);
                 }
+				sizeComponentsToBrowser();
+				interval1 = setInterval(function (){ moveShapes() }, 50);
             }
+			
+			function moveShapes(){
+				var shapes = $('#playingField').children();
+				for (var i = 0; i < shapes.length; i++){
+					//console.log($(shapes[i]).id + "\n" + $(shapes[i]).css('left') + "\n" + $(shapes[i]).css('top'));
+					if (parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')) < 0){
+						$(shapes[i]).css('left', 0);
+						shapes[i].setAttribute('data-hSpeed', -1 * parseInt(shapes[i].getAttribute('data-hSpeed')));
+					}
+					else if (parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')) > $('#playingField').width() - parseInt($(shapes[i]).css('width'))){
+						$(shapes[i]).css('left', $('#playingField').width() - parseInt($(shapes[i]).css('width')));
+						shapes[i].setAttribute('data-hSpeed', -1 * parseInt(shapes[i].getAttribute('data-hSpeed')));
+					}
+					if (parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')) < 0){
+						$(shapes[i]).css('top', 0);
+						shapes[i].setAttribute('data-vSpeed', -1 * parseInt(shapes[i].getAttribute('data-vSpeed')));
+					}
+					else if (parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')) > $('#playingField').height() - parseInt($(shapes[i]).css('height'))){
+						$(shapes[i]).css('top', $('#playingField').height() - parseInt($(shapes[i]).css('height')));
+						shapes[i].setAttribute('data-vSpeed', -1 * parseInt(shapes[i].getAttribute('data-vSpeed')));
+					}
+					
+					//console.log(parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')));
+					$(shapes[i]).css('left', parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')));
+					$(shapes[i]).css('top', parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')));
+				}
+			}
 
             socket.on('point', function () {
                 points++;
                 repositionPlayers();
                 if (points == pointsToWin) {
-                    socket.emit('win', matchNum);
+                    socket.emit('win', matchID);
                 }
             });
-
-            socket.on('losePoint', function () {
-                points--;
+			
+            socket.on('losePoint', function (shapeID) {
+                removeShape(shapeID);
+				points--;
                 repositionPlayers();
             });
+			
+			function removeShape(shapeID){
+				var shapes = $('#playingField').children();
+				for (var s = 0; s < shapes.length; s++){
+					if (shapes[s].id == shapeID){
+						$(shapes[s]).remove();
+					}
+				}
+			}
 
             function repositionPlayers() {
-                if (player == 1) {
-                    var left = (screenWidth / 4) - ((screenWidth / (pointsToWin * 4)) * points);
+                //console.log(browserWidth);
+				if (player == 1) {
+					//console.log("browserWidth: " + browserWidth + "\npos by points: " + ((browserWidth / (pointsToWin * 4)) * points) + "\nposition" + parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points)));
+                    //var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player1').width()) / 2));
+					var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points));
                     $("#player1").css('left', left);
-                    $("#player2").css('left', left + (screenWidth / 2));
+                    $("#player2").css('left', left + (browserWidth / 2) - parseInt($('#player1').width()));
                 }
                 else {
-                    var left = ((screenWidth / 4) * 3) + ((screenWidth / (pointsToWin * 4)) * points);
+                    //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player2').width()) / 2));
+					var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - parseInt($('#player2').width()));
                     $("#player2").css('left', left);
-                    $("#player1").css('left', left - (screenWidth / 2));
+                    $("#player1").css('left', left - (browserWidth / 2) + parseInt($('#player2').width()));
                 }
             }
 
             socket.on('win', function () {
-                alert("You win!!");
+                clearInterval(interval1);
+				alert("You win!!");
+				window.location.replace(homePageURL);
             });
 
-            socket.on('lose', function () {
-                alert("You lost :(");
+            socket.on('winByDisconnect', function(){
+				clearInterval(interval1);
+				alert("You're opponent has disconnected from the match.\nYou win!!");
+				window.location.replace(homePageURL);
+			});
+			
+			socket.on('lose', function () {
+                clearInterval(interval1);
+				alert("You lost :(");
+				window.location.replace(homePageURL);
             });
+			
+			socket.on('tie', function(){
+				clearInterval(interval1);
+				alert("You've tied with your opponent.");
+				window.location.replace(homePageURL);
+			});
+			
+			/*socket.on('updatematchID', function(newmatchID){
+				matchID = newmatchID;
+			});*/
+			
+			
         </script>
         
         <link rel="StyleSheet" href="css/styles.css" />

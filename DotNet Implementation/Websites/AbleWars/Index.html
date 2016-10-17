@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="utf-8" />
+    <title>Able Wars</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Normal">
+    <link rel="StyleSheet" href="css/styles.css" />
+    <script src="javascript/jquery.js"></script>
+	<script>
+		var browserWidth, browserHeight;
+		
+		$(document).ready(function(){
+			sizeComponentsToBrowser();
+		});
+		
+		$(window).resize(function(){
+			sizeComponentsToBrowser();
+		});
+		
+		function sizeComponentsToBrowser(){
+			browserWidth = $(window).width();
+			browserHeight = $(window).height();
+			$('#able_wars_').width(browserWidth * 0.7);
+			$('#able_wars_').css('margin-left', browserWidth * 0.15);
+			$('#able_wars_').height(browserHeight * 0.3);
+			$('#able_wars_').css('margin-top', parseFloat($('#able_wars_').height()) / 8);
+			$('#able_wars_').css('margin-bottom', parseFloat($('#able_wars_').height()) / 8);
+			$('#able_wars_').css('font-size', $('#able_wars_').height() * 0.4);
+			$('#go_to_war').css('width', browserWidth / 3);
+			$('#go_to_war').css('margin-left', browserWidth / 3);
+			$('#go_to_war').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
+			$('#go_to_war').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
+			$('#profile').css('width', browserWidth / 3);
+			$('#profile').css('margin-left', browserWidth / 3);
+			$('#profile').css('height', parseFloat($('#profile').css('width')) / 5.34);
+			$('#profile').css('margin-top', parseFloat($('#profile').css('height')) * 0.5);
+			$('#settings').css('width', browserWidth / 3);
+			$('#settings').css('margin-left', browserWidth / 3);
+			$('#settings').css('height', parseFloat($('#settings').css('width')) / 5.34);
+			$('#settings').css('margin-top', parseFloat($('#settings').css('height')) * 0.5);
+		}
+	</script>
+    <!-- Add your custom HEAD content here -->
+
+</head>
+<body>
+    <div id="content-container">
+        <div id="artboard_1">
+            <div id="able_wars_">
+                ABLE<br>WARS!
+            </div>
+           <!-- <div class="mainBtn warBtn" id="rounded_rectangle_1">
+            </div>
+            <div class="txtBtn warBtn" id="go_to_war">
+                Go To War
+            </div>
+            <div class="mainBtn settingsBtn" id="rounded_rectangle_1_copy"></div>
+            <div class="txtBtn settingsBtn" id="settings">
+                Settings
+            </div>
+              <div class="mainBtn profileBtn" id="rounded_rectangle_1_copy_2"></div>
+           
+            <div class="txtBtn profileBtn" id="profile">
+                Profile
+            </div>-->
+            <a href="http://10.16.11.144:4000/play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
+            <a href="profile.html"><div class="mainBtn profileBtn"><img id="profile" src="../img/profileBtn.png"/></div></a>
+            <a href="settings.html"><div class="mainBtn settingsBtn"><img id="settings" src="../img/settingsBtn.png"/></div></a>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+	/*$(".mainBtn").draggable()
+    $(".mainBtn").(function () {
+        if ($(this).hasClass("warBtn")) {
+            if($(this).hasClass("warClick"))
+                $(this).removeClass("warClick")
+        }
+        else if ($(this).hasClass("settingsBtn")) {
+            if($(this).hasClass("settingsClick"))
+                $(this).removeClass("settingsClick")            
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            if($(this).hasClass("profileClick"))
+                $(this).removeClass("profileClick")      
+        }
+    });*/
+	
+    $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("warBtn")) {
+            $(this).addClass("warClick");
+            GoToWar();
+        }
+        else if ($(this).hasClass("settingsBtn")) {
+            $(this).addClass("settingsClick");
+            GoToSettings();
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            $(this).addClass("profileClick");
+            GoToProfile();
+        }
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("warBtn")) {
+            $(this).removeClass("warClick");
+        }
+        else if ($(this).hasClass("settingsBtn")) {
+            $(this).removeClass("settingsClick");
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            $(this).removeClass("profileClick");
+        }
+    })
+</script>

@@ -8,14 +8,14 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-			var homePageURL = "http://10.16.26.135:4000";
+			var homePageURL = "http://10.16.11.144:4000";
             var socket = io.connect(homePageURL);
             var points = 0;
             var pointsToWin = 10;
             var player = 1;
             var round = -1;
 			var timeRemaining = 60;
-			var shapeRequestInterval = 15;
+			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
 			var matchID;

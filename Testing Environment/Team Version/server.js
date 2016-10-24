@@ -48,7 +48,7 @@ io.on('connection', function (socket) {
     }
     else {
 		var player2ID = Date.now();
-        var match = { matchID: "match:" + waitingPlayerID + ":" + player2ID, player1: { playerID: waitingPlayerID, socket: waitingSocket, targetTimestamp: 0 }, player2: { playerID: player2ID, socket: socket, targetTimestamp: 0 }, higherScore: -1 };
+        var match = { matchID: "match:" + waitingPlayerID + ":" + player2ID, player1: { playerID: waitingPlayerID, socket: waitingSocket, targetTimestamp: 0 }, player2: { playerID: player2ID, socket: socket, targetTimestamp: 0 }, higherScore: -11 };
 		matches.push(match);
         numOfMatches++;
 
@@ -153,7 +153,7 @@ io.on('connection', function (socket) {
 		var match = getMatchByID(data['matchID']);
 		var score = data['score'];
 		//console.log("matchIndex = " + matchIndex + "\nhigherScore = " + parseInt(matches[matchIndex]['higherScore']) + "\nscore = " + score);
-		if (parseInt(matches[matchIndex]['higherScore']) < 0){
+		if (parseInt(matches[matchIndex]['higherScore']) < -10){
 			matches[matchIndex]['higherScore'] = score;
 		}
 		else {

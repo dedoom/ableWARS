@@ -18,35 +18,50 @@
     
     <script>
         $(document).ready(function() {
-            $("#form1").submit( function(e) {
-            e.preventDefault();
-            var user = $("#txtUser").val();
-            var pass = $("#txtPass").val();
-            var credentials = {
-                username : user,
-                password : pass
-            };
             
-            var jsonCredentials = JSON.stringify(credentials);
-            //alert(jsonCredentials);
-            $.ajax({
-                url : 'http://localhost:4000/signIn',
-                type : 'POST',
-                data : jsonCredentials,
-                contentType : 'application/json',
-                dataType : 'json',
-                success : function(result) {
-                    if (result == "200") {
-                        window.location.assign("/MainMenu.html");
-                    } else {
-                        alert("login Failed");
-                    }
-                },
-                error : function(jqXHR, textStatus, err) {
-                    alert('text status '+textStatus+', err '+err);
+            $("#form1").submit( function(e) {
+                e.preventDefault();
+                
+                $("#errorUser").text("");
+                $("#errorPass").text("");
+                
+                var user = $("#txtUser").val();
+                var pass = $("#txtPass").val();
+                user = user.replace(/\s+/g, '');
+                if (user == "") {
+                    $("#errorUser").text("Username required!");
+                } else if (pass == ""){
+                    $("#errorPass").text("Password required!");
+                }
+                else {
+                    var credentials = {
+                        username : user,
+                        password : pass
+                    };
+
+                    var jsonCredentials = JSON.stringify(credentials);
+                    //alert(jsonCredentials);
+                    $.ajax({
+                        url : 'http://localhost:4000/signIn',
+                        type : 'POST',
+                        data : jsonCredentials,
+                        contentType : 'application/json',
+                        dataType : 'json',
+                        success : function(result) {
+                            if (result == "200") {
+                                window.location.assign("/MainMenu.html");
+                            } else if (result == "410") {
+                                $("#errorUser").text("Username doesn't exist!");
+                            } else if (result == "420") {
+                                $("#errorPass").text("Password Incorrect!");
+                            }
+                        },
+                        error : function(jqXHR, textStatus, err) {
+                            alert('text status '+textStatus+', err '+err);
+                        }
+                    });
                 }
             });
-        });
         });
     </script>
     
@@ -61,8 +76,8 @@
                     <td>Username :<br />&nbsp;</td>
                     <td>
                         <Input ID="txtUser" name="txtUser"></Input>
-                        <br />&nbsp;<Label ID="validUser" Font-Bold="True" Font-Italic="True" ForeColor="Red"></Label>
-                        <Label ID="errorUser" Font-Bold="True" Font-Italic="True" ForeColor="#CC0000"></Label>
+                        <br />&nbsp;
+                        <Label class="lbl" ID="errorUser"></Label>
                     </td>
                 </tr>
                 <tr>
@@ -71,8 +86,8 @@
 
                         <Input ID="txtPass" name="txtPass" Width="180px" type="Password"></Input>
 
-                        <br />&nbsp;<Label ID="validPass" Font-Bold="True" Font-Italic="True" ForeColor="Red"></Label>
-                        <Label ID="errorPass" Font-Bold="True" Font-Italic="True" ForeColor="#CC0000"></Label>
+                        <br />&nbsp;
+                        <Label class="lbl" ID="errorPass"></Label>
 
                     </td>
                 </tr>

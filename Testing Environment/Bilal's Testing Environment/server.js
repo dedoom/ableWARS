@@ -253,7 +253,8 @@ app.post('/signIn', function(req, res, next) {
     //console.log(req.body.password);
     var user = req.body.username;
     var pass = req.body.password;
-    var response;
+    //200 : success / 410 : username not found / 420 : password incorrect
+    var response = "";
     
     var dbConn = new sql.Connection(config);
     
@@ -265,19 +266,31 @@ app.post('/signIn', function(req, res, next) {
 //            console.log(recordSet);
         
         //Validate credentials//
-        request.query("SELECT * FROM account WHERE username='" + user + "' AND password='" + pass + "'").then(function (recordSet) {
-            if(recordSet.length > 0) {
-                //console.log(recordSet);
-                response = "200";
-                console.log(response);
-                res.end(response);
-            }else {
-                //console.log("No user info found");
-                response = "400";
+        request.query("SELECT * FROM account WHERE username='" + user + "'").then(function (recordSet) {
+            if (recordSet.length == 0) {
+                response = "410";
                 console.log(response);
                 res.end(response);
             }
         });
+        
+        if (response == "") {
+            request.query("SELECT * FROM account WHERE username='" + user + "' AND password='" + pass + "'").then(function (recordSet) {
+                if(recordSet.length > 0) {
+                    //console.log(recordSet);
+                    response = "200";
+                    console.log(response);
+                    res.end(response);
+                }else {
+                    //console.log("No user info found");
+                    response = "420";
+                    console.log(response);
+                    res.end(response);
+                }
+            });
+        }
+        
+        
             console.log("db connection closed")
             dbConn.close();
         }).catch(function (err) {

@@ -17,7 +17,17 @@ var express = require('express'),
     app = express(),
     server = require('http').Server(app),
     io = require('socket.io').listen(server),
-    path = require('path');
+    path = require('path'),
+    bodyParser = require("body-parser"),
+    sql = require('mssql');
+
+var config = {
+        server: 'localhost',
+        database: 'AbleWars',
+        user: 'able',
+        password: 'password',
+        port: 1433
+    };
 
 var clientCount = 0;
 var clientWaiting = false;
@@ -30,10 +40,12 @@ var needNewShapes = true;
 var shapesPerRequest = 5;
 
 app.use(express.static(path.join(__dirname + '/')));
+app.use(bodyParser.json({extend:true}))
 
 app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/login.html');
 });
+
 
 server.listen(4000, function () {
     console.log("listening on port 4000");
@@ -233,3 +245,47 @@ function getNewShape(i) {
 
     return { id: id, picker: picker, height: height};
 }
+
+// *************************************************************************************** //
+// ************************************ LOGIN PORTION ************************************ //
+
+app.post('/signIn', function(req, res, next) {
+    //console.log(req.body.password);
+    var user = req.body.username;
+    var pass = req.body.password;
+    var response;
+    
+    var dbConn = new sql.Connection(config);
+    
+    dbConn.connect().then(function () {
+        console.log("db connection openned")
+        var request = new sql.Request(dbConn);
+        //For testing display//
+//        request.query("select * from account").then(function (recordSet) {
+//            console.log(recordSet);
+        
+        //Validate credentials//
+        request.query("SELECT * FROM account WHERE username='" + user + "' AND password='" + pass + "'").then(function (recordSet) {
+            if(recordSet.length > 0) {
+                //console.log(recordSet);
+                response = "200";
+                console.log(response);
+                res.end(response);
+            }else {
+                //console.log("No user info found");
+                response = "400";
+                console.log(response);
+                res.end(response);
+            }
+        });
+            console.log("db connection closed")
+            dbConn.close();
+        }).catch(function (err) {
+        console.log("Connection Failed");
+        console.log(err);
+        });
+    });
+
+//app.get('/test/:id', function(req, res, next) {
+//    console.log(req.params.id);
+//});

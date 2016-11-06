@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Login</title>
+    <style type="text/css">
+        .auto-style1 {
+            height: 26px;
+        }
+    </style>
+    <link rel="StyleSheet" href="../loginStyle.css" />
+    <!--<script src="/verify.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; text-align: center;">
+    
+    
+    <script>
+        $(document).ready(function() {
+            $("#form1").submit( function(e) {
+            e.preventDefault();
+            var user = $("#txtUser").val();
+            var pass = $("#txtPass").val();
+            var credentials = {
+                username : user,
+                password : pass
+            };
+            
+            var jsonCredentials = JSON.stringify(credentials);
+            //alert(jsonCredentials);
+            $.ajax({
+                url : 'http://localhost:4000/signIn',
+                type : 'POST',
+                data : jsonCredentials,
+                contentType : 'application/json',
+                dataType : 'json',
+                success : function(result) {
+                    if (result == "200") {
+                        window.location.assign("/MainMenu.html");
+                    } else {
+                        alert("login Failed");
+                    }
+                },
+                error : function(jqXHR, textStatus, err) {
+                    alert('text status '+textStatus+', err '+err);
+                }
+            });
+        });
+        });
+    </script>
+    
+    <div id="center">
+        <br />
+    <h2>Login Page</h2>
+    <h4>Please enter your credentials</h4>
+    <form id="form1" method="post">
+        <div id="LoginForm">
+            <table border="0" align="center">
+                <tr>
+                    <td>Username :<br />&nbsp;</td>
+                    <td>
+                        <Input ID="txtUser" name="txtUser"></Input>
+                        <br />&nbsp;<Label ID="validUser" Font-Bold="True" Font-Italic="True" ForeColor="Red"></Label>
+                        <Label ID="errorUser" Font-Bold="True" Font-Italic="True" ForeColor="#CC0000"></Label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="auto-style1">Password :<br />&nbsp;</td>
+                    <td class="auto-style1">
+
+                        <Input ID="txtPass" name="txtPass" Width="180px" type="Password"></Input>
+
+                        <br />&nbsp;<Label ID="validPass" Font-Bold="True" Font-Italic="True" ForeColor="Red"></Label>
+                        <Label ID="errorPass" Font-Bold="True" Font-Italic="True" ForeColor="#CC0000"></Label>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: right">
+                        <Input type="submit" value="Login"  style="margin-left: 0px"></Input>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+    </div>
+</body>
+</html>

@@ -84,8 +84,13 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 }
 
 .shape{
-	position: absolute;
+   position: absolute;
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
 }
+
 
 .player{
 	position: absolute;

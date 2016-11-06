@@ -5,7 +5,6 @@
         <title></title>
         <script src="javascript/jquery.js"></script> 
         <script src="/socket.io/socket.io.js"></script>
-        <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
             var homePageURL = "http://localhost:4000";
@@ -124,12 +123,14 @@
             }
 			
 			function countDown(){
-				$("#timer").text(timeRemaining);
 				timeRemaining--;
+				$("#timer").text(timeRemaining);
 				if (timeRemaining <= 0){
+					$("#timer").text("Times Up");
 					socket.emit('timeUp', { matchID: matchID, score: points });
 					clearInterval(interval2);
 					clearInterval(interval1);
+					clearScreen();
 				}
 				else if (timeRemaining % shapeRequestInterval == 0){
 					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
@@ -141,6 +142,9 @@
 				newShapes(shapes);
             });
 
+			function clearScreen(){
+				$("#playingField").empty();
+			}
             function newShapes(shapes) {
                 round++;
                 for (i = 0; i < shapes.length; i++) {

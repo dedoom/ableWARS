@@ -8,7 +8,7 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var homePageURL = "http://10.16.11.63:4000";
+            var homePageURL = "http://10.0.1.15:4000";
 			var ipAddress;
             var socket = io.connect(homePageURL);
             var points = 0;
@@ -20,7 +20,7 @@
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
 			var matchID;
-			var interval1, interval2;
+			var interval1, interval2, interval3;
 			var playerID;
 			var browserWidth, browserHeight;
 			var lastPlayingFieldWidth, lastPlayingFieldHeight;
@@ -32,7 +32,7 @@
 				lastPlayingFieldHeight = $('#playingField').height();
                 $("#playingField").on("mousedown", "div", function (event) {
 					console.log(this.id);
-                    /*if (this.id === round + "shape" + 0) {
+                   /* if (this.id === round + "shape" + 0) {
                         var timestamp = Date.now();
                         socket.emit('targetShapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
                     }*/
@@ -117,8 +117,11 @@
                 else {
                     $("#timer").text("Go!");
                     clearInterval(interval1);
+                  //  setTargetShape(shapeImgs); //Nov 12, 2016
                     newShapes(shapes);
-					interval2 = setInterval(function(){ countDown() }, 1000);
+                    setTargetShape();
+                    interval2 = setInterval(function () { countDown() }, 1000);
+                    interval3 = setInterval(function () { setTargetShape() }, 3000)
 					interval1 = setInterval(function (){ moveShapes() }, 50);
                 }
             }
@@ -129,6 +132,7 @@
 				if (timeRemaining <= 0){
 					$("#timer").text("Times Up");
 					socket.emit('timeUp', { matchID: matchID, score: points });
+					clearInterval(interval3)
 					clearInterval(interval2);
 					clearInterval(interval1);
 					clearScreen();
@@ -146,6 +150,14 @@
 			function clearScreen(){
 				$("#playingField").empty();
 			}
+
+            //For Avery to convert to socket
+			function setTargetShape() {
+			    var targetedShape = Math.floor(Math.random() * 11);
+			    $("#targetShape").empty();
+			    $("#targetShape").append("<div style='display:block' class='shapeTarget' ><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[targetedShape] + "'></div>");
+			}
+
             function newShapes(shapes) {
                 round++;
                 for (i = 0; i < shapes.length; i++) {

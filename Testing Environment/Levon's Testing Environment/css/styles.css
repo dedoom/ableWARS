@@ -62,6 +62,24 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
     background:url(../img/profileBtnClick.png) !important;
 }
 
+#targetShape{
+    position:relative;
+    display:block;
+    align-content:center;
+}
+.shapeTarget{
+    height:50px;
+    width:50px;
+}
+.shapeTarget img{
+    height:50px;
+    width:50px;
+}
+
+#gameHeader{
+
+}
+
 #playingField{
 	position: relative;
     border:thick;

@@ -89,19 +89,32 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 	position: absolute;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 500px) {
     /* For mobile devices: */
     [class*="playingField"] {
         width: 100%;
     }
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 500px) {
     /* For mobile devices: */
     [class*="content-container"] {
         width: 100%;
     }
 }
 
+@media only screen and (min-width: 600px) {
+    /* For Tablets: */
+    [class*="content-container"] {
+        width: 100%;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    /* For Tablets: */
+    [class*="playingField"] {
+        width: 100%;
+    }
+}
 .player{
 	position: absolute;
     border-radius: 50%;

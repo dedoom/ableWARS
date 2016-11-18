@@ -18,12 +18,16 @@
 			var timeRemaining = 60;
 			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
+            var actions = ["TAP!", "TOUCH!", "SWIPE!", "HOLD!"];
             var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
 			var matchID;
 			var interval1, interval2;
 			var playerID;
 			var browserWidth, browserHeight;
 			var lastPlayingFieldWidth, lastPlayingFieldHeight;
+			var shapeList = [];
+			var targetShape = 0;
+			var targetShapeLives;
 
             $(document).ready(function () {
                 //create an onClick event for each <div> in the playing field to remove itself and increment player
@@ -31,15 +35,20 @@
 				lastPlayingFieldWidth = $('#playingField').width();
 				lastPlayingFieldHeight = $('#playingField').height();
                 $("#playingField").on("mousedown", "div", function (event) {
-					console.log(this.id);
-                    /*if (this.id === round + "shape" + 0) {
+					console.log(this.getAttribute("data-isTarget"));
+                    if (this.id === round + "shape" + targetShape) {
                         var timestamp = Date.now();
-                        socket.emit('targetShapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
-                    }*/
-					var timestamp = Date.now();
+						var sID = this.id;
+						targetShapeLives--;
+						$("#targetLives").text(targetShapeLives);
+						if (targetShapeLives <= 0){
+							socket.emit('targetShapeClick', { matchID: matchID, shapeID: sID });
+						}
+                    }
+					/*var timestamp = Date.now();
 					var sID = this.id;
 					$(this).remove();
-					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });
+					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });*/
                 });
             });
 			
@@ -117,8 +126,9 @@
                 else {
                     $("#timer").text("Go!");
                     clearInterval(interval1);
+                  //  setTargetShape(shapeImgs); //Nov 12, 2016
                     newShapes(shapes);
-					interval2 = setInterval(function(){ countDown() }, 1000);
+                    interval2 = setInterval(function () { countDown() }, 1000);
 					interval1 = setInterval(function (){ moveShapes() }, 50);
                 }
             }
@@ -133,20 +143,40 @@
 					clearInterval(interval1);
 					clearScreen();
 				}
-				else if (timeRemaining % shapeRequestInterval == 0){
+				/*else if (timeRemaining % shapeRequestInterval == 0){
 					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
 					socket.emit('shapesRequest');
-				}
+				}*/
 			}
 
             socket.on('newShapes', function (shapes) {
+				$("#playingField").empty();
 				newShapes(shapes);
             });
 
+			socket.on('newTargetShapeLives', function(targetLives){
+				var hasMultilives = Math.Floor(Math.random() * 10);
+				if (hasMultilives > 7){
+					targetShapeLives = targetLives;
+				}
+				console.log("tsl: " + targetShapeLives);
+				$("#targetLives").text(targetShapeLives);
+			});
+			
 			function clearScreen(){
 				$("#playingField").empty();
 			}
+
+            //For Avery to convert to socket
+			function setTargetShape(shapes) {
+				console.log(targetShape);
+			    $("#targetShape").empty();
+			    $("#targetShape").append("<div style='display:block' class='shapeTarget' ><img  src='../img/shapes/" + shapeImgs[shapes[targetShape]['picker']] + "'></div>");
+			}
+
             function newShapes(shapes) {
+				//shapeList.push(shapes);
+				setTargetShape(shapes);
                 round++;
                 for (i = 0; i < shapes.length; i++) {
 					var shapeID = "" + round + "shape" + i;
@@ -279,8 +309,20 @@
         <link rel="StyleSheet" href="css/styles.css" />
     </head>
     <body>
-        <p id="timer">3</p>
-        <div id ="targetShape"></div>
+        <div id="gameHeader">
+        <!--    <p style="text-align:center">Target: </p>
+          <div id="targetShape">
+              
+          </div>
+            <p style="text-align:center">Time: </p>
+          <p id="timer">3</p>-->
+        <table style="margin:0 auto">
+               
+                <tr><th>Timer: </th><td id="timer">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target: </th><td id="targetShape"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target Lives: </th><td id="targetLives"></td></tr>
+            </table>
+            </div>
+          
+
         <div id="playingField"></div>
         <div id="scoreBoard">
             <div class="player" id="player1">Player 1</div>

@@ -52,14 +52,35 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 
 .warClick {
 	background:url(../img/warBtnClick.png) !important;
+	position: relative !important;
 }
 
 .settingsClick{
     background:url(../img/settingsBtnClick.png) !important;
+	position: relative !important;
 }
 
 .profileClick{
     background:url(../img/profileBtnClick.png) !important;
+	position: relative !important;
+}
+
+#targetShape{
+    position:relative;
+    display:block;
+    align-content:center;
+}
+.shapeTarget{
+    height:50px;
+    width:50px;
+}
+.shapeTarget img{
+    height:50px;
+    width:50px;
+}
+
+#gameHeader{
+
 }
 
 #playingField{

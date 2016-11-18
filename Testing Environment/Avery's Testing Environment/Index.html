@@ -35,10 +35,10 @@
 			$('#profile').css('margin-left', browserWidth / 3);
 			$('#profile').css('height', parseFloat($('#profile').css('width')) / 5.34);
 			$('#profile').css('margin-top', parseFloat($('#profile').css('height')) * 0.5);
-			$('#settings').css('width', browserWidth / 3);
-			$('#settings').css('margin-left', browserWidth / 3);
-			$('#settings').css('height', parseFloat($('#settings').css('width')) / 5.34);
-			$('#settings').css('margin-top', parseFloat($('#settings').css('height')) * 0.5);
+			$('#instructions').css('width', browserWidth / 3);
+			$('#instructions').css('margin-left', browserWidth / 3);
+			$('#instructions').css('height', parseFloat($('#instructions').css('width')) / 5.34);
+			$('#instructions').css('margin-top', parseFloat($('#instructions').css('height')) * 0.5);
 		}
 	</script>
     <!-- Add your custom HEAD content here -->
@@ -55,18 +55,18 @@
             <div class="txtBtn warBtn" id="go_to_war">
                 Go To War
             </div>
-            <div class="mainBtn settingsBtn" id="rounded_rectangle_1_copy"></div>
-            <div class="txtBtn settingsBtn" id="settings">
-                Settings
+            <div class="mainBtn instructionsBtn" id="rounded_rectangle_1_copy"></div>
+            <div class="txtBtn instructionsBtn" id="instructions">
+                instructions
             </div>
               <div class="mainBtn profileBtn" id="rounded_rectangle_1_copy_2"></div>
            
             <div class="txtBtn profileBtn" id="profile">
                 Profile
             </div>-->
-            <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
-            <a href="profile.html"><div class="mainBtn profileBtn"><img id="profile" src="../img/profileBtn.png"/></div></a>
-            <a href="settings.html"><div class="mainBtn settingsBtn"><img id="settings" src="../img/settingsBtn.png"/></div></a>
+			<a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="../img/warBtn.png"/></a>
+            <a href="profile.html"><img class="mainBtn profileBtn" id="profile" src="../img/profileBtn.png"/></a>
+            <a href="instructions.html"><img class="mainBtn instructionsBtn" id="instructions" src="../img/instructionsBtn.png"/></a>
         </div>
     </div>
 </body>
@@ -78,9 +78,9 @@
             if($(this).hasClass("warClick"))
                 $(this).removeClass("warClick")
         }
-        else if ($(this).hasClass("settingsBtn")) {
-            if($(this).hasClass("settingsClick"))
-                $(this).removeClass("settingsClick")            
+        else if ($(this).hasClass("instructionsBtn")) {
+            if($(this).hasClass("instructionsClick"))
+                $(this).removeClass("instructionsClick")            
         }
         else if ($(this).hasClass("profileBtn")) {
             if($(this).hasClass("profileClick"))
@@ -91,28 +91,25 @@
     $(".mainBtn").mousedown(function () {
        
         if ($(this).hasClass("warBtn")) {
-            $(this).addClass("warClick");
-            GoToWar();
-        }
-        else if ($(this).hasClass("settingsBtn")) {
-            $(this).addClass("settingsClick");
-            GoToSettings();
+            $(this).attr('src', "../img/warBtnClick.png");
         }
         else if ($(this).hasClass("profileBtn")) {
-            $(this).addClass("profileClick");
-            GoToProfile();
+            $(this).attr('src', "../img/profileBtnClick.png");
+        }
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).attr('src', "../img/instructionsBtnClick.png");
         }
     });
 	
     $(".mainBtn").mouseup(function () {
         if ($(this).hasClass("warBtn")) {
-            $(this).removeClass("warClick");
-        }
-        else if ($(this).hasClass("settingsBtn")) {
-            $(this).removeClass("settingsClick");
+            $(this).attr('src', "../img/warBtn.png");
         }
         else if ($(this).hasClass("profileBtn")) {
-            $(this).removeClass("profileClick");
+            $(this).attr('src', "../img/profileBtn.png");
+        }
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).attr('src', "../img/instructionsBtn.png");
         }
     })
 </script>

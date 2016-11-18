@@ -35,10 +35,10 @@
 			$('#profile').css('margin-left', browserWidth / 3);
 			$('#profile').css('height', parseFloat($('#profile').css('width')) / 5.34);
 			$('#profile').css('margin-top', parseFloat($('#profile').css('height')) * 0.5);
-			$('#settings').css('width', browserWidth / 3);
-			$('#settings').css('margin-left', browserWidth / 3);
-			$('#settings').css('height', parseFloat($('#settings').css('width')) / 5.34);
-			$('#settings').css('margin-top', parseFloat($('#settings').css('height')) * 0.5);
+			$('#instructions').css('width', browserWidth / 3);
+			$('#instructions').css('margin-left', browserWidth / 3);
+			$('#instructions').css('height', parseFloat($('#instructions').css('width')) / 5.34);
+			$('#instructions').css('margin-top', parseFloat($('#instructions').css('height')) * 0.5);
 		}
 	</script>
     <!-- Add your custom HEAD content here -->
@@ -66,7 +66,7 @@
             </div>-->
             <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
             <a href="profile.html"><div class="mainBtn profileBtn"><img id="profile" src="../img/profileBtn.png"/></div></a>
-            <a href="settings.html"><div class="mainBtn settingsBtn"><img id="settings" src="../img/settingsBtn.png"/></div></a>
+            <a href="Instructions.html"><div class="mainBtn instructionsBtn"><img id="instructions" src="../img/instructionsBtn.png"/></div></a>
         </div>
     </div>
 </body>
@@ -94,8 +94,8 @@
             $(this).addClass("warClick");
             GoToWar();
         }
-        else if ($(this).hasClass("settingsBtn")) {
-            $(this).addClass("settingsClick");
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).addClass("instructionsClick");
             GoToSettings();
         }
         else if ($(this).hasClass("profileBtn")) {
@@ -108,8 +108,8 @@
         if ($(this).hasClass("warBtn")) {
             $(this).removeClass("warClick");
         }
-        else if ($(this).hasClass("settingsBtn")) {
-            $(this).removeClass("settingsClick");
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).removeClass("instructionsClick");
         }
         else if ($(this).hasClass("profileBtn")) {
             $(this).removeClass("profileClick");

@@ -80,7 +80,7 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 }
 
 #gameHeader{
-
+    
 }
 
 #playingField{
@@ -109,18 +109,28 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 }
 
 .player{
+    
 	position: absolute;
     border-radius: 50%;
     behavior: url(PIE.htc); /* remove if you don't care about IE8 */
-    width: 50px;
+    width: 40px;
     height: 50px;
 	margin-bottom: 10px !important;
-    background: yellow;
-    border: 4px solid red;
+  ,/* background: yellow;
+    border: 4px solid red;     */   
     font-size: 10px;
     line-height: 50px;
     text-align: center;
+    /* background-image: url(../img/ninja/Run__000.png);*/
 
 
+
+}
+#player2{
+    background-image: url(../img/ninja/Run__000p2.png);
+
+}
+#player1{
+    background-image: url(../img/ninja/Run__000p1.png);
 
 }

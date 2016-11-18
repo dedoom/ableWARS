@@ -32,7 +32,7 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 	color:#030300;
 }
 
-#settings {
+#instructions {
 	position: relative !important;
 }
 
@@ -54,8 +54,8 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 	background:url(../img/warBtnClick.png) !important;
 }
 
-.settingsClick{
-    background:url(../img/settingsBtnClick.png) !important;
+.instructionsClick{
+    background:url(../img/instructionsBtnClick.png) !important;
 }
 
 .profileClick{
@@ -80,6 +80,12 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 #timer{
 	/*float: left;*/
 	font-size: 30pt;
+	text-align: center;
+}
+
+#pageHeader{
+	/*float: left;*/
+	font-size: 50pt;
 	text-align: center;
 }
 

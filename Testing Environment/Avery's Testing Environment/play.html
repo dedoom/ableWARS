@@ -155,7 +155,7 @@
             });
 
 			socket.on('newTargetShapeLives', function(targetLives){
-				var hasMultilives = Math.Floor(Math.random() * 10);
+				var hasMultilives = Math.floor(Math.random() * 10);
 				if (hasMultilives > 7){
 					targetShapeLives = targetLives;
 				}

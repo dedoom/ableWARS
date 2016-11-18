@@ -52,14 +52,17 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 
 .warClick {
 	background:url(../img/warBtnClick.png) !important;
+	position: relative !important;
 }
 
 .settingsClick{
     background:url(../img/settingsBtnClick.png) !important;
+	position: relative !important;
 }
 
 .profileClick{
     background:url(../img/profileBtnClick.png) !important;
+	position: relative !important;
 }
 
 #targetShape{

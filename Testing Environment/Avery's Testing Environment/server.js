@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
         numOfMatches++;
 
         var shapes = getShapes();
-		var targetLives = Math.floor(Math.random() * 5) + 1;
+		var targetLives = getTargetLives();
 		socket.emit('newTargetShapeLives', targetLives);
 		waitingSocket.emit('newTargetShapeLives', targetLives);
         socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, player: 2, playerID: player2ID });
@@ -102,7 +102,7 @@ io.on('connection', function (socket) {
         socket.emit('point');
         match['player' + opponent]['socket'].emit('losePoint', data['shapeID']);
         var shapes = getShapes();
-		var targetLives = Math.floor(Math.random() * 5) + 1;
+		var targetLives = getTargetLives();
         socket.emit('newShapes', shapes);
 		socket.emit('newTargetShapeLives', targetLives);
         match['player' + opponent]['socket'].emit('newShapes', shapes);
@@ -117,7 +117,7 @@ io.on('connection', function (socket) {
 		else {
 			needNewShapes = true;
 		}
-        var targetLives = Math.floor(Math.random() * 5) + 1;
+        var targetLives = getTargetLives();
         socket.emit('newShapes', newShapes);
 		socket.emit('newTargetShapeLives', targetLives);
 	});
@@ -187,6 +187,15 @@ io.on('connection', function (socket) {
 		matches.splice(getIndexOfMatchByID(matchID), 1);
     });
 });
+
+function getTargetLives(){
+	targetLives = 1;
+	var hasMultilives = Math.floor(Math.random() * 10);
+	if (hasMultilives > 7){
+		targetLives = Math.floor(Math.random() * 5) + 1;;
+	}
+	return targetLives;
+}
 
 function getMatchByID(matchID){
 	for (var m = 0; m < matches.length; m++){

@@ -188,6 +188,15 @@ io.on('connection', function (socket) {
     });
 });
 
+function getTargetLives(){
+	targetLives = 1;
+	var hasMultilives = Math.floor(Math.random() * 10);
+	if (hasMultilives > 7){
+		targetLives = Math.floor(Math.random() * 5) + 1;;
+	}
+	return targetLives;
+}
+
 function getMatchByID(matchID){
 	for (var m = 0; m < matches.length; m++){
 		if (matches[m]['matchID'] == matchID){

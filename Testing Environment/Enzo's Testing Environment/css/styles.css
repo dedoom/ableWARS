@@ -10,14 +10,19 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 /* Only edit this if you know what you are doing! */
 /*div { position: absolute; }*/
 
-#content-container { display: block; position: absolute; width: 100%; height: 100%; background:url(../img/layer_1.png); }
+#content-container { display: block; position: absolute; width: 100%; height: 100%;}
 
 #artboard_1 {
 	top: 0px;
 	left: 0px;
 	width: 100%;
 	height: 100%;
-	background:url(../img/layer_1.png);
+}
+
+html{
+
+     background-size:cover;
+     background-image:url(../img/Backgrounds/WebsiteBackground.png) !important;
 }
 
 #able_wars_ {
@@ -44,6 +49,10 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 	position: relative !important;
 }
 
+#go_to_menu {
+	position: relative !important;
+}
+
 /* Add your custom CSS here */
 
 .mainBtn:hover{
@@ -62,6 +71,10 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
     background:url(../img/profileBtnClick.png) !important;
 }
 
+.IndexClick{
+    background:url(../img/mmBtnClick.png) !important;
+}
+
 #playingField{
 	position: relative;
     border:thick;
@@ -70,7 +83,9 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
     height: 400px;
     border-color:black;
     border-style:solid;
-	clear:left
+	clear:left;
+    background:url(../img/Backgrounds/CanvasBackground.png);
+
 }
 
 #scoreBoard{
@@ -85,7 +100,7 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 
 #pageHeader{
 	/*float: left;*/
-	font-size: 50pt;
+	font-size:60pt;
 	text-align: center;
 }
 
@@ -113,4 +128,10 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 
 
 
+}
+
+#HowToPlayText{
+    text-align:center !important;
+    font-size: 20pt !important;
+    font-weight: bold !important;
 }

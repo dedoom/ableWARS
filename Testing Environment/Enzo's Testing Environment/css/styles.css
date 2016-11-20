@@ -127,6 +127,10 @@ html{
     margin: 10px;
 }
 
+.SISOAlt{
+    width: 300px !important;
+}
+
 #SISOButtons:hover{
     opacity: 1;
     box-shadow: 5px 10px 10px #0F781A;
@@ -139,7 +143,6 @@ html{
     margin-top: 2px;
     margin-left: 10px;
     border-radius: 5px;
-    width:50px;
     user-select: none;
     cursor: default;
     float: right;

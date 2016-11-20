@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <script src="javascript/jquery.js"></script> 
+        <script src="/socket.io/socket.io.js"></script>
+        <!--<script src="javascript/gameplay.js"></script>-->
+        <link rel="StyleSheet" href="css/styles.css" />
+    </head>
+    <body>
+        <p id="pageHeader">How To Play</p>
+        <br />
+        <br />
+        <p>To play ABLE WARS you must listen to the correct instructions</p>
+        <p>You advance your teams position whenever a correct action is taken</p>
+        <p>Put your enemies in the mud and prove your GREATNESS</p>
+			
+		
+		<div id="artboard_1">
+            <div id="able_wars_">
+                ABLE<br>WARS!
+            </div>
+           <!-- <div class="mainBtn warBtn" id="rounded_rectangle_1">
+            </div>
+            <div class="txtBtn warBtn" id="go_to_war">
+                Go To War
+            </div>
+            <div class="mainBtn settingsBtn" id="rounded_rectangle_1_copy"></div>
+            <div class="txtBtn settingsBtn" id="settings">
+                Settings
+            </div>
+              <div class="mainBtn profileBtn" id="rounded_rectangle_1_copy_2"></div>
+           
+            <div class="txtBtn profileBtn" id="profile">
+                Profile
+            </div>-->
+            <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
+            <a href="profile.html"><div class="mainBtn profileBtn"><img id="profile" src="../img/profileBtn.png"/></div></a>
+            <a href="Instructions.html"><div class="mainBtn instructionsBtn"><img id="instructions" src="../img/instructionsBtn.png"/></div></a>
+        </div>
+		
+    </body>
+	
+	
+	<script>
+		var browserWidth, browserHeight;
+		
+		$(document).ready(function(){
+			sizeComponentsToBrowser();
+		});
+		
+		$(window).resize(function(){
+			sizeComponentsToBrowser();
+		});
+		
+		function sizeComponentsToBrowser(){
+			browserWidth = $(window).width();
+			browserHeight = $(window).height();
+			
+			$('#profile').css('width', browserWidth / 3);
+			$('#profile').css('margin-left', browserWidth / 3);
+			$('#profile').css('height', parseFloat($('#profile').css('width')) / 5.34);
+			$('#profile').css('margin-top', parseFloat($('#profile').css('height')) * 0.5);
+			$('#instructions').css('width', browserWidth / 3);
+			$('#instructions').css('margin-left', browserWidth / 3);
+			$('#instructions').css('height', parseFloat($('#instructions').css('width')) / 5.34);
+			$('#instructions').css('margin-top', parseFloat($('#instructions').css('height')) * 0.5);
+		}
+		
+		 $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("warBtn")) {
+            $(this).addClass("warClick");
+            GoToWar();
+        }
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).addClass("instructionsClick");
+            GoToSettings();
+        }
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("warBtn")) {
+            $(this).removeClass("warClick");
+        }
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).removeClass("instructionsClick");
+        }
+        else if ($(this).hasClass("profileBtn")) {
+            $(this).removeClass("profileClick");
+        }
+    })
+		
+	</script>
+</html>

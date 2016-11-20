@@ -112,6 +112,55 @@ html{
   user-select: none;
 }
 
+#SISOButtons{
+    background-color: grey;
+    width: 510px;
+    border-radius: 5px;
+    opacity: .7;
+    position: relative;
+    font-weight: bold;
+    font-style: italic;
+    clear: both;
+    float:right;
+    user-select: none;
+    padding: 8px;
+    margin: 10px;
+}
+
+#SISOButtons:hover{
+    opacity: 1;
+    box-shadow: 5px 10px 10px #0F781A;
+}
+
+.accBtn {
+    background-color: lightskyblue;
+    padding: 0em 2em 0em 2em;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    margin-left: 10px;
+    border-radius: 5px;
+    width:50px;
+    user-select: none;
+    cursor: default;
+    float: right;
+}
+
+#btnContainer{
+    
+    margin-left:auto;
+    margin-right: auto;
+    min-width: inherit; 
+}
+
+.accBtn:hover{
+    background-color: black;
+    color: aqua;
+    user-select: none;
+}
+
+#welcomeMessage{
+    padding: 3px;
+}
 
 .player{
 	position: absolute;
@@ -125,9 +174,6 @@ html{
     font-size: 10px;
     line-height: 50px;
     text-align: center;
-
-
-
 }
 
 #HowToPlayText{

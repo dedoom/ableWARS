@@ -55,29 +55,28 @@
             <div class="txtBtn warBtn" id="go_to_war">
                 Go To War
             </div>
-            <div class="mainBtn settingsBtn" id="rounded_rectangle_1_copy"></div>
-            <div class="txtBtn settingsBtn" id="settings">
-                Settings
+            <div class="mainBtn instructionsBtn" id="rounded_rectangle_1_copy"></div>
+            <div class="txtBtn instructionsBtn" id="instructions">
+                instructions
             </div>
               <div class="mainBtn profileBtn" id="rounded_rectangle_1_copy_2"></div>
            
             <div class="txtBtn profileBtn" id="profile">
                 Profile
             </div>-->
-            <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
-            <a href="profile.html"><div class="mainBtn profileBtn"><img id="profile" src="../img/profileBtn.png"/></div></a>
-            <a href="Instructions.html"><div class="mainBtn instructionsBtn"><img id="instructions" src="../img/instructionsBtn.png"/></div></a>
+			<a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="../img/warBtn.png"/></a>
+            <a href="Profile.html"><img class="mainBtn profileBtn" id="profile" src="../img/profileBtn.png"/></a>
+            <a href="Instructions.html"><img class="mainBtn instructionsBtn" id="instructions" src="../img/instructionsBtn.png"/></a>
         </div>
     </div>
-
-    <div id="SISOButtons">
+	
+	<div id="SISOButtons">
         <label id="welcomeMessage">Login to access the game! Don't have an account? Register Now!</label>
         <div id="btnContainer">
             <div class="accBtn" id="logInButton">   Log In</div>
             <div class="accBtn" id="registerButton">Register</div>   
         </div>  
     </div>
-
 </body>
 </html>
 <script>
@@ -87,9 +86,9 @@
             if($(this).hasClass("warClick"))
                 $(this).removeClass("warClick")
         }
-        else if ($(this).hasClass("settingsBtn")) {
-            if($(this).hasClass("settingsClick"))
-                $(this).removeClass("settingsClick")            
+        else if ($(this).hasClass("instructionsBtn")) {
+            if($(this).hasClass("instructionsClick"))
+                $(this).removeClass("instructionsClick")            
         }
         else if ($(this).hasClass("profileBtn")) {
             if($(this).hasClass("profileClick"))
@@ -100,28 +99,25 @@
     $(".mainBtn").mousedown(function () {
        
         if ($(this).hasClass("warBtn")) {
-            $(this).addClass("warClick");
-            GoToWar();
-        }
-        else if ($(this).hasClass("instructionsBtn")) {
-            $(this).addClass("instructionsClick");
-            GoToSettings();
+            $(this).attr('src', "../img/warBtnClick.png");
         }
         else if ($(this).hasClass("profileBtn")) {
-            $(this).addClass("profileClick");
-            GoToProfile();
+            $(this).attr('src', "../img/profileBtnClick.png");
+        }
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).attr('src', "../img/instructionsBtnClick.png");
         }
     });
 	
     $(".mainBtn").mouseup(function () {
         if ($(this).hasClass("warBtn")) {
-            $(this).removeClass("warClick");
-        }
-        else if ($(this).hasClass("instructionsBtn")) {
-            $(this).removeClass("instructionsClick");
+            $(this).attr('src', "../img/warBtn.png");
         }
         else if ($(this).hasClass("profileBtn")) {
-            $(this).removeClass("profileClick");
+            $(this).attr('src', "../img/profileBtn.png");
+        }
+        else if ($(this).hasClass("instructionsBtn")) {
+            $(this).attr('src', "../img/instructionsBtn.png");
         }
     })
 </script>

@@ -10,7 +10,7 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 /* Only edit this if you know what you are doing! */
 /*div { position: absolute; }*/
 
-#content-container { display: block; position: absolute; width: 100%; height: 100%;}
+#content-container { display: block; position: absolute; width: 100%; height: 100%; background:url(../img/layer_1.png); }
 
 #artboard_1 {
 	top: 0px;
@@ -52,26 +52,35 @@ html{
 	position: relative !important;
 }
 
+#waitingTag{
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	font-size: 500%;
+}
+
 /* Add your custom CSS here */
 
 .mainBtn:hover{
     cursor: pointer;
 }
 
-.warClick {
-	background:url(../img/warBtnClick.png) !important;
-}
-
-.instructionsClick{
-    background:url(../img/instructionsBtnClick.png) !important;
-}
-
-.profileClick{
-    background:url(../img/profileBtnClick.png) !important;
-}
-
 .IndexClick{
     background:url(../img/mmBtnClick.png) !important;
+}
+
+#targetShape{
+    position:relative;
+    display:block;
+    align-content:center;
+}
+.shapeTarget{
+    height:50px;
+    width:50px;
+}
+.shapeTarget img{
+    height:50px;
+    width:50px;
 }
 
 #playingField{
@@ -83,7 +92,7 @@ html{
     border-color:black;
     border-style:solid;
 	clear:left;
-    background:url(../img/Backgrounds/CanvasBackground.png);
+	background:url(../img/Backgrounds/CanvasBackground.png);
 }
 
 #scoreBoard{
@@ -103,11 +112,25 @@ html{
 }
 
 .shape{
-   position: absolute;
+	position: absolute;
   -webkit-user-select: none;  
   -moz-user-select: none;    
   -ms-user-select: none;      
   user-select: none;
+}
+
+.team{
+	position: absolute;
+    border-radius: 50%;
+    behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+    width: 50px;
+    height: 50px;
+	margin-bottom: 10px !important;
+    background: yellow;
+    border: 4px solid red;
+    font-size: 10px;
+    line-height: 50px;
+    text-align: center;
 }
 
 #SISOButtons{
@@ -147,7 +170,6 @@ html{
 }
 
 #btnContainer{
-    
     margin-left:auto;
     margin-right: auto;
     min-width: inherit; 
@@ -164,32 +186,27 @@ html{
 }
 
 .player{
-    
 	position: absolute;
     border-radius: 50%;
     behavior: url(PIE.htc); /* remove if you don't care about IE8 */
     width: 40px;
     height: 50px;
 	margin-bottom: 10px !important;
-  ,/* background: yellow;
-    border: 4px solid red;     */   
+	/*background: yellow;
+    border: 4px solid red;*/   
     font-size: 10px;
     line-height: 50px;
     text-align: center;
-    /* background-image: url(../img/ninja/Run__000.png);*/
-
-
-
+    /*background-image: url(../img/ninja/Run__000.png);*/
 }
+
 #player2{
     background-image: url(../img/robot/Run__000p1.png);
-
 }
+
 #player1{
     background-image: url(../img/ninja/Run__000p1.png);
-
 }
-
 
 #HowToPlayText{
     text-align:center !important;

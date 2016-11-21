@@ -64,9 +64,9 @@
 				browserWidth = $(window).width();
 				browserHeight = $(window).height();
 				//resize
-				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#player1').outerHeight(true)));
+				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#team1').outerHeight(true)));
 				$('#timer').css('margin-top', parseInt($('#timer').css('margin-bottom')));
-				$('#playingField').css("height", browserHeight - (parseInt($('#timer').outerHeight(true)) * 2) - parseInt($('#player1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
+				$('#playingField').css("height", browserHeight - (parseInt($('#timer').outerHeight(true)) * 2) - parseInt($('#team1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
 				//console.log("playingField height: " + $('#playingField').height());
 				$('#timer').css('margin-top', parseInt($('#timer').height()) / 2);
 				repositionPlayers();
@@ -287,16 +287,16 @@
                 //console.log(browserWidth);
 				if (player == 1) {
 					//console.log("browserWidth: " + browserWidth + "\npos by points: " + ((browserWidth / (pointsToWin * 4)) * points) + "\nposition" + parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points)));
-                    //var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player1').width()) / 2));
+                    //var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#team1').width()) / 2));
 					var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points));
-                    $("#player1").css('left', left);
-                    $("#player2").css('left', left + (browserWidth / 2) - parseInt($('#player1').width()));
+                    $("#team1").css('left', left);
+                    $("#team2").css('left', left + (browserWidth / 2) - parseInt($('#team1').width()));
                 }
                 else {
-                    //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player2').width()) / 2));
-					var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - parseInt($('#player2').width()));
-                    $("#player2").css('left', left);
-                    $("#player1").css('left', left - (browserWidth / 2) + parseInt($('#player2').width()));
+                    //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#team2').width()) / 2));
+					var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - parseInt($('#team2').width()));
+                    $("#team2").css('left', left);
+                    $("#team1").css('left', left - (browserWidth / 2) + parseInt($('#team2').width()));
                 }
             }
 
@@ -384,8 +384,8 @@
 
         <div id="playingField"></div>
         <div id="scoreBoard">
-            <div class="player" id="player1">Team 1</div>
-            <div class="player" id="player2">Team 2</div>
+            <div class="team" id="team1">Team 1</div>
+            <div class="team" id="team2">Team 2</div>
         </div>
     </body>
 </html>

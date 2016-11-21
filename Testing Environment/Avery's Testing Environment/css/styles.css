@@ -115,7 +115,7 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 	position: absolute;
 }
 
-.player{
+.team{
 	position: absolute;
     border-radius: 50%;
     behavior: url(PIE.htc); /* remove if you don't care about IE8 */

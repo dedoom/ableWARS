@@ -20,13 +20,15 @@ var express = require('express'),
     path = require('path');
 
 var clientCount = 0;
-var clientWaiting = false;
-var waitingSocket;
+var numOfClientsQueued = 0;
+var player1Socket;
+var player2Socket;
+var player3Socket;
 var matches = [];
 var numOfMatches = 0;
-var waitingPlayerID;
-var newShapes;
-var needNewShapes = true;
+var player1ID;
+var player2ID;
+var player3ID;
 var shapesPerRequest = 5;
 
 app.use(express.static(path.join(__dirname + '/')));
@@ -41,152 +43,291 @@ server.listen(4000, function () {
 
 io.on('connection', function (socket) {
 	console.log("client connected");
-    if (!clientWaiting) {
-        clientWaiting = true;
-        waitingSocket = socket;
-		waitingPlayerID = Date.now();
+    if (numOfClientsQueued == 0) {
+        numOfClientsQueued++;
+        player1Socket = socket;
+		player1ID = Date.now();
+		socket.emit('playerNum', 1);
     }
+	else if (numOfClientsQueued == 1) {
+        numOfClientsQueued++;
+        player2Socket = socket;
+		player2ID = Date.now();
+		socket.emit('playerNum', 2);
+	}
+	else if (numOfClientsQueued == 2) {
+        numOfClientsQueued++;
+        player3Socket = socket;
+		player3ID = Date.now();
+		socket.emit('playerNum', 3);
+	}
     else {
-		var player2ID = Date.now();
-        var match = { matchID: "match:" + waitingPlayerID + ":" + player2ID, player1: { playerID: waitingPlayerID, socket: waitingSocket, targetTimestamp: 0 }, player2: { playerID: player2ID, socket: socket, targetTimestamp: 0 }, higherScore: -1 };
+		var player4ID = Date.now();
+		socket.emit('playerNum', 4);
+        var match = {
+			matchID: "match:" + Date.now(),
+			team1: {
+				player1: { playerID: player1ID, socket: player1Socket, targetTimestamp: 0 }, 
+				player2: { playerID: player3ID, socket: player3Socket, targetTimestamp: 0 },
+				score: -11},
+			team2: {
+				player1: {playerID: player2ID, socket: player2Socket, targetTimestamp: 0 },
+				player2: {playerID: player4ID, socket: socket, targetTimestamp: 0 },
+				score: -11},
+			gameOver: false};
 		matches.push(match);
         numOfMatches++;
+		console.log(matches[numOfMatches - 1]['team1']['player1']['playerID']);
 
         var shapes = getShapes();
 		var targetLives = Math.floor(Math.random() * 5) + 1;
-		socket.emit('newTargetShapeLives', targetLives);
-		waitingSocket.emit('newTargetShapeLives', targetLives);
-        socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, player: 2, playerID: player2ID });
-        waitingSocket.emit('startGame', { matchID: match['matchID'], shapes: shapes, player: 1, playerID: waitingPlayerID });
+		player1Socket.emit('newTargetShapeLives', targetLives);
+		player2Socket.emit('newTargetShapeLives', targetLives);
+		player3Socket.emit('newTargetShapeLives', targetLives);
+        socket.emit('newTargetShapeLives', targetLives);
 		
-		waitingSocket = null;
-		clientWaiting = false;
-		waitingPlayerID = null;
+        player1Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player1ID });
+		player2Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player2ID });
+		player3Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player3ID });
+		socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player4ID });
+		
+		numOfClientsQueued = 0;
+		player1Socket = null;
+		player2Socket = null;
+		player3Socket = null;
     }
 	
 	socket.on('disconnect', function(){
-		console.log("client disconnected");
-		if (socket == waitingSocket){
-			console.log("waiting socket client disconnected");
-			clientWaiting = false;
-			waitingSocket = null;
+		if (socket == player1Socket){
+			console.log("player1 socket client disconnected");
+			player1Socket = null;
+			if (player2Socket != null){
+				console.log("player 2 pushed to player 1");
+				player1Socket = player2Socket;
+				player2Socket = null;
+				player1Socket.emit('playerNum', 1);
+			}
+			if (player3Socket != null){
+				console.log("player 3 pushed to player 2");
+				player2Socket = player3Socket;
+				player3Socket = null;
+				player2Socket.emit('playerNum', 2);
+			}
+			numOfClientsQueued--;
+		}
+		else if (socket == player2Socket){
+			console.log("player2 socket client disconnected");
+			player2Socket = null;
+			if (player3Socket != null){
+				console.log("player 3 pushed to player 2");
+				player2Socket = player3Socket;
+				player3Socket = null;
+				player2Socket.emit('playerNum', 2);
+			}
+			numOfClientsQueued--;
+		}
+		else if (socket == player3Socket){
+			console.log("player3 socket client disconnected");
+			player3Socket = null;
+			numOfClientsQueued--;
 		}
 		else {
 			for (var m = 0; m < matches.length; m++){
-				if (matches[m]['player1']['socket'] == socket){
-					matches[m]['player2']['socket'].emit('winByDisconnect');
+				if (matches[m]['team1']['player1']['socket'] == socket){
+					console.log("player1 socket client disconnected");
+					matches[m]['team2']['player1']['socket'].emit('winByDisconnect');
+					matches[m]['team2']['player2']['socket'].emit('winByDisconnect');
+					matches[m]['team1']['player2']['socket'].emit('loseByTeamDisconnect');
 					matches.splice(m, 1);
-					console.log("match found after spliced!");
+					numOfMatches--;
 				}
-				else if (matches[m]['player2']['socket'] == socket){
-					matches[m]['player1']['socket'].emit('winByDisconnect');
+				else if (matches[m]['team1']['player2']['socket'] == socket){
+					console.log("player3 socket client disconnected");
+					matches[m]['team2']['player1']['socket'].emit('winByDisconnect');
+					matches[m]['team2']['player2']['socket'].emit('winByDisconnect');
+					matches[m]['team1']['player1']['socket'].emit('loseByTeamDisconnect');
 					matches.splice(m, 1);
-					console.log("match found after spliced!");
+					numOfMatches--;
+				}
+				else if (matches[m]['team2']['player1']['socket'] == socket){
+					console.log("player2 socket client disconnected");
+					matches[m]['team1']['player1']['socket'].emit('winByDisconnect');
+					matches[m]['team1']['player2']['socket'].emit('winByDisconnect');
+					matches[m]['team2']['player1']['socket'].emit('loseByTeamDisconnect');
+					matches.splice(m, 1);
+					numOfMatches--;
+				}
+				else if (matches[m]['team2']['player2']['socket'] == socket){
+					console.log("player4 socket client disconnected");
+					matches[m]['team1']['player1']['socket'].emit('winByDisconnect');
+					matches[m]['team1']['player2']['socket'].emit('winByDisconnect');
+					matches[m]['team2']['player2']['socket'].emit('loseByTeamDisconnect');
+					matches.splice(m, 1);
+					numOfMatches--;
 				}
 			}
+			ensureSplice(162);
 		}
 	});
 
     socket.on('targetShapeClick', function (data) {
 		//console.log(data['matchID']);
         var match = getMatchByID(data['matchID']);
-        var player = 0, opponent = 0;
-        if (match['player1']['socket'] == socket){
-            player = 1;
-            opponent = 2;
+        var team = 0, opponentTeam = 0;
+        if (match['team1']['player1']['socket'] == socket || match['team1']['player2']['socket'] == socket){
+            team = 1;
+            opponentTeam = 2;
         }
         else {
-            player = 2;
-            opponent = 1;
+            team = 2;
+            opponentTeam = 1;
         }
-        socket.emit('point');
-        match['player' + opponent]['socket'].emit('losePoint', data['shapeID']);
+        match['team' + team]['player1']['socket'].emit('point');
+		match['team' + team]['player2']['socket'].emit('point');
+        match['team' + opponentTeam]['player1']['socket'].emit('losePoint', data['shapeID']); //check method
+		match['team' + opponentTeam]['player2']['socket'].emit('losePoint', data['shapeID']); // check method
         var shapes = getShapes();
 		var targetLives = Math.floor(Math.random() * 5) + 1;
-        socket.emit('newShapes', shapes);
-		socket.emit('newTargetShapeLives', targetLives);
-        match['player' + opponent]['socket'].emit('newShapes', shapes);
-		match['player' + opponent]['socket'].emit('newTargetShapeLives', targetLives);
+        match['team' + team]['player1']['socket'].emit('newShapes', shapes);
+		match['team' + team]['player1']['socket'].emit('newTargetShapeLives', targetLives);
+		match['team' + team]['player2']['socket'].emit('newShapes', shapes);
+		match['team' + team]['player2']['socket'].emit('newTargetShapeLives', targetLives);
+        match['team' + opponentTeam]['player1']['socket'].emit('newShapes', shapes);
+		match['team' + opponentTeam]['player1']['socket'].emit('newTargetShapeLives', targetLives);
+		match['team' + opponentTeam]['player2']['socket'].emit('newShapes', shapes);
+		match['team' + opponentTeam]['player2']['socket'].emit('newTargetShapeLives', targetLives);
     });
 	
-	socket.on('shapesRequest', function(){
-		if (needNewShapes){
-			needNewShapes = false;
-			newShapes = getShapes();
-		}
-		else {
-			needNewShapes = true;
-		}
+	/*socket.on('shapesRequest', function(data){
+		needNewShapes--;
+		newShapes = getShapes();
+		var match = getMatchByID(data['matchID']);
+		
         var targetLives = Math.floor(Math.random() * 5) + 1;
-        socket.emit('newShapes', newShapes);
-		socket.emit('newTargetShapeLives', targetLives);
-	});
+        match['team1']['player1']['socket'].emit('newShapes', newShapes);
+		match['team1']['player1']['socket'].emit('newTargetShapeLives', targetLives);
+		match['team1']['player2']['socket'].emit('newShapes', newShapes);
+		match['team1']['player2']['socket'].emit('newTargetShapeLives', targetLives);
+		match['team2']['player1']['socket'].emit('newShapes', newShapes);
+		match['team2']['player1']['socket'].emit('newTargetShapeLives', targetLives);
+		match['team2']['player2']['socket'].emit('newShapes', newShapes);
+		match['team2']['player2']['socket'].emit('newTargetShapeLives', targetLives);
+	});*/
 
 	socket.on('shapeClick', function (data) {
 		//console.log(data['matchID']);
         var match = getMatchByID(data['matchID']);
-        var player = 0, opponent = 0;
-        if (match['player1']['socket'] == socket){
-            player = 1;
-            opponent = 2;
+        var team = 0, opponentTeam = 0;
+        if (match['team1']['player1']['socket'] == socket || match['team1']['player2']['socket'] == socket){
+            team = 1;
+            opponentTeam = 2;
         }
         else {
-            player = 2;
-            opponent = 1;
+            team = 2;
+            opponentTeam = 1;
         }
 		//console.log("player: " + player + "  opponent: " + opponent);
-        socket.emit('point');
-        match['player' + opponent]['socket'].emit('losePoint', data['shapeID']);
+        match['team' + team]['player1']['socket'].emit('point');
+		match['team' + team]['player2']['socket'].emit('point');
+        match['team' + opponentTeam]['player1']['socket'].emit('losePoint'/*, data['shapeID']*/);
+		match['team' + opponentTeam]['player2']['socket'].emit('losePoint'/*, data['shapeID']*/);
     });
 	
 	socket.on('timeUp', function(data){
 		var matchIndex = getIndexOfMatchByID(data['matchID']);
 		var match = getMatchByID(data['matchID']);
+		console.log("player" + data['playerNum'] + "emit tie");
+		if (match == null){
+			console.log("time up called on null match by player " + data['playerNum']);
+			return;
+		}
+		if (data['playerNum'] == 3 || data['playerNum'] == 4){
+			console.log("time up called by player " + data['playerNum']);
+			return;
+		}
+		match['gameOver'] = true;
 		var score = data['score'];
 		//console.log("matchIndex = " + matchIndex + "\nhigherScore = " + parseInt(matches[matchIndex]['higherScore']) + "\nscore = " + score);
-		if (parseInt(matches[matchIndex]['higherScore']) < 0){
-			matches[matchIndex]['higherScore'] = score;
-		}
-		else {
-			var opponent = 0;
-			if (match['player1']['socket'] == socket) {
-				opponent = 2;
+		var team = 0, opponentTeam = 0, player = 0;
+			if (match['team1']['player1']['socket'] == socket || match['team1']['player2']['socket'] == socket) {
+				team = 1;
+				opponentTeam = 2;
 			}
 			else {
-				opponent = 1;
+				team = 2;
+				opponentTeam = 1;
 			}
-			if (score > parseInt(matches[matchIndex]['higherScore'])){
-				match['player' + opponent]['socket'].emit('lose');
+		matches[matchIndex]['team' + team]['score'] = score;
+		if (matches[matchIndex]['team1']['score'] > -11 && matches[matchIndex]['team2']['score'] > -11) {
+			if (matches[matchIndex]['team1']['score'] > matches[matchIndex]['team2']['score']){
+				match['team' + opponentTeam]['player1']['socket'].emit('lose');
+				match['team' + opponentTeam]['player2']['socket'].emit('lose');
+				match['team' + team]['player1']['socket'].emit('win');
+				match['team' + team]['player2']['socket'].emit('win');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
-				socket.emit('win');
+				numOfMatches--;
+				ensureSplice(256);
 			}
-			else if (score < parseInt(matches[matchIndex]['higherScore'])){
-				match['player' + opponent]['socket'].emit('win');
+			else if (matches[matchIndex]['team1']['score'] < matches[matchIndex]['team2']['score']){
+				match['team' + opponentTeam]['player1']['socket'].emit('win');
+				match['team' + opponentTeam]['player2']['socket'].emit('win');
+				match['team' + team]['player1']['socket'].emit('lose');
+				match['team' + team]['player2']['socket'].emit('lose');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
-				socket.emit('lose');
+				numOfMatches--;
+				ensureSplice(265);
 			}
 			else {
-				match['player' + opponent]['socket'].emit('tie');
+				match['team' + opponentTeam]['player1']['socket'].emit('tie');
+				match['team' + opponentTeam]['player2']['socket'].emit('tie');
+				match['team' + team]['player1']['socket'].emit('tie');
+				match['team' + team]['player2']['socket'].emit('tie');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
-				socket.emit('tie');
+				numOfMatches--;
+				ensureSplice(274);
 			}
 		}
 	});
 	
     socket.on('win', function (matchID) {
-        var opponent = 0;
+        var team = 0, opponentTeam = 0;
 		var match = getMatchByID(matchID);
-        if (match['player1']['socket'] == socket) {
-            opponent = 2;
+		if (match == null){
+			console.log("time up called on null match by player " + data['playerNum']);
+			return;
+		}
+		if (data['playerNum'] == 3 || data['playerNum'] == 4){
+			console.log("time up called by player " + data['playerNum']);
+			return;
+		}
+		match['gameOver'] = true;
+        if (match['team1']['player1']['socket'] == socket || match['team1']['player2']['socket'] == socket) {
+            team = 1;
+			opponentTeam = 2;
         }
         else {
-            opponent = 1;
+			team = 2;
+            opponentTeam = 1;
         }
-        socket.emit('win');
-        match['player' + opponent]['socket'].emit('lose');
+        match['team' + team]['player1']['socket'].emit('win');
+		match['team' + team]['player2']['socket'].emit('win');
+        match['team' + opponentTeam]['player1']['socket'].emit('lose');
+		match['team' + opponentTeam]['player2']['socket'].emit('lose');
 		matches.splice(getIndexOfMatchByID(matchID), 1);
+		numOfMatches--;
+		ensureSplice(296);
     });
 });
+
+function ensureSplice(line){
+	for (var m = 0; m < matches.length; m++){
+		if (matches[m]['team1']['player1']['socket'] == socket || matches[m]['team1']['player2']['socket'] == socket || matches[m]['team2']['player1']['socket'] == socket || matches[m]['team2']['player2']['socket'] == socket){
+			console.log("match found after splice");
+			return;
+		}
+	}
+	console.log("splice at line " + line + ": NO match found after splice");
+}
 
 function getTargetLives(){
 	targetLives = 1;

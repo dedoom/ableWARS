@@ -8,14 +8,14 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var homePageURL = "http://localhost:4000";
+            var homePageURL = "http://192.168.0.3:4000";
 			var ipAddress;
             var socket = io.connect(homePageURL);
             var points = 0;
             var pointsToWin = 10;
             var player = 1;
             var round = -1;
-			var timeRemaining = 60;
+			var timeRemaining = 6;
 			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var actions = ["TAP!", "TOUCH!", "SWIPE!", "HOLD!"];
@@ -28,6 +28,9 @@
 			var shapeList = [];
 			var targetShape = 0;
 			var targetShapeLives;
+			var gameOverAnimCount = 0;
+			var endGameResult;
+			var waitingTagStrCount = 0;
 
             $(document).ready(function () {
                 //create an onClick event for each <div> in the playing field to remove itself and increment player
@@ -62,7 +65,7 @@
 				//resize
 				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#player1').outerHeight(true)));
 				$('#timer').css('margin-top', parseInt($('#timer').css('margin-bottom')));
-				$('#playingField').css("height", browserHeight - parseInt($('#timer').outerHeight(true)) - parseInt($('#player1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
+				$('#playingField').css("height", browserHeight - (parseInt($('#timer').outerHeight(true)) * 2) - parseInt($('#player1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
 				//console.log("playingField height: " + $('#playingField').height());
 				$('#timer').css('margin-top', parseInt($('#timer').height()) / 2);
 				repositionPlayers();
@@ -104,20 +107,41 @@
 
 			socket.on('connect', function(){
 				socket.on('disconnect', function(){
-					console.log("i have been disconnected from the server.");
+					alert("You have been disconnected from the server.");
 					window.location.replace(homePageURL);
 				});
 			});
 			
+			function appendWaitingTag(){
+				waitingTagStrCount++;
+				waitingTagStrCount = waitingTagStrCount % 5;
+				var waitingTagStr = "Waiting for other players"
+				for (var i = 0; i < waitingTagStrCount; i++){
+					waitingTagStr = waitingTagStr + ".";
+				}
+				$('#playingField').empty();
+				console.log(waitingTagStrCount);
+				$('#playingField').append("<p style='display:block' id='waitingTag'>" + waitingTagStr + "</p>");
+			}
+			
             socket.on('startGame', function (data) {
+				$('#playingField').empty();
+				clearInterval(interval1);
                 counter = 3;
                 matchID = data['matchID'];
-				player = data['player'];
 				playerID = data['playerID'];
 				//alert("Match #: " + matchID + "\nPlayer: " + player);
                 interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
             });
 
+			socket.on('playerNum', function(data){
+				player = data;
+				//console.log(player);
+				$('#playerNum').text(player);
+				clearInterval(interval1);
+				interval1 = setInterval(function(){ appendWaitingTag() }, 500);
+			});
+			
             function startInterval(shapes) {
                 counter--;
                 if (counter != 0) {
@@ -138,10 +162,10 @@
 				$("#timer").text(timeRemaining);
 				if (timeRemaining <= 0){
 					$("#timer").text("Times Up");
-					socket.emit('timeUp', { matchID: matchID, score: points });
 					clearInterval(interval2);
 					clearInterval(interval1);
-					clearScreen();
+					//clearScreen();
+					socket.emit('timeUp', { matchID: matchID, score: points, playerNum: player });
 				}
 				/*else if (timeRemaining % shapeRequestInterval == 0){
 					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
@@ -163,11 +187,10 @@
 				$("#targetLives").text(targetShapeLives);
 			});
 			
-			function clearScreen(){
+			/*function clearScreen(){
 				$("#playingField").empty();
-			}
+			}*/
 
-            //For Avery to convert to socket
 			function setTargetShape(shapes) {
 				console.log(targetShape);
 			    $("#targetShape").empty();
@@ -243,19 +266,17 @@
                 }
             });
 			
-            socket.on('losePoint', function (shapeID) {
-                removeShape(shapeID);
+            socket.on('losePoint', function (/*shapeID*/) {
+                //removeShape(shapeID);
 				points--;
                 repositionPlayers();
             });
 			
-			function removeShape(shapeID){
-				var shapes = $('#playingField').children();
-				for (var s = 0; s < shapes.length; s++){
-					if (shapes[s].id == shapeID){
-						$(shapes[s]).remove();
-					}
+			function removeShape(shape){
+				if (gameOverAnimCount >= $('#playingField').children().length){
+					clearInterval(interval1);
 				}
+				//interval2 = setInterval(function(){fadeOutShape(shape)}, 10);
 			}
 
             function repositionPlayers() {
@@ -276,28 +297,62 @@
             }
 
             socket.on('win', function () {
-                clearInterval(interval1);
-				alert("You win!!");
-				window.location.replace(homePageURL);
+				//alert("You win!!");
+				endGameResult = "win";
+				gameOver();
             });
 
             socket.on('winByDisconnect', function(){
-				clearInterval(interval1);
-				alert("You're opponent has disconnected from the match.\nYou win!!");
-				window.location.replace(homePageURL);
+				//alert("You're opponent has disconnected from the match.\nYou win!!");
+				endGameResult = "winDisconnect";
+				gameOver();
+			});
+			
+			socket.on('loseByTeamDisconnect', function(){
+				//alert("You're teammate has disconnected from the match.\nYou lose :(");
+				endGameResult = "loseDisconnect";
+				gameOver();
 			});
 			
 			socket.on('lose', function () {
-                clearInterval(interval1);
-				alert("You lost :(");
-				window.location.replace(homePageURL);
+				//alert("You lost :(");
+				endGameResult = "lose";
+				gameOver();
             });
 			
 			socket.on('tie', function(){
-				clearInterval(interval1);
-				alert("You've tied with your opponent.");
-				window.location.replace(homePageURL);
+				//alert("You've tied with your opponent.");
+				endGameResult = "tie";
+				gameOver();
 			});
+			
+			function gameOver(){
+				clearInterval(interval1);
+				var shapeDivs = $('#playingField').children();
+				interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
+			}
+			
+			function fadeOutShape(shape){
+				$(shape).css('height', parseInt($(shape).css('height')) - 2);
+				$(shape).children().css('height', $(shape).height());
+				$(shape).css('width', $(shape).height() * shapeWidthRatios[shape.getAttribute('data-picker')]);
+				$(shape).children().css('width', $(shape).width());
+				if (parseInt($(shape).css('height')) <= 0){
+					clearInterval(interval1);
+					var shapeDivs = $('#playingField').children();
+					interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
+					$(shape).remove();
+					console.log($('#playingField').children().length);
+					if ($('#playingField').children().length <= 0){
+						displayEndScreen();
+					}
+				}
+			}
+			
+			function displayEndScreen(){
+				//alert(endGameResult);
+				window.location.replace(homePageURL);
+			}
 			
 			/*socket.on('updatematchID', function(newmatchID){
 				matchID = newmatchID;
@@ -317,7 +372,7 @@
             <p style="text-align:center">Time: </p>
           <p id="timer">3</p>-->
         <table style="margin:0 auto">
-               
+				<tr><th>You are player: </th><td id="playerNum"></td></tr>
                 <tr><th>Timer: </th><td id="timer">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target: </th><td id="targetShape"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target Lives: </th><td id="targetLives"></td></tr>
             </table>
             </div>
@@ -325,8 +380,8 @@
 
         <div id="playingField"></div>
         <div id="scoreBoard">
-            <div class="player" id="player1">Player 1</div>
-            <div class="player" id="player2">Player 2</div>
+            <div class="player" id="player1">Team 1</div>
+            <div class="player" id="player2">Team 2</div>
         </div>
     </body>
 </html>

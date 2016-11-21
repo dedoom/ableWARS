@@ -44,6 +44,13 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 	position: relative !important;
 }
 
+#waitingTag{
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	font-size: 500%;
+}
+
 /* Add your custom CSS here */
 
 .mainBtn:hover{

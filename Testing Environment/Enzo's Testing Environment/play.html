@@ -20,7 +20,9 @@
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
 			var matchID;
-			var interval1, interval2;
+			var interval1, interval2, interval4;
+			var firstSprite = 0;
+			var secondSprite = 0;
 			var playerID;
 			var browserWidth, browserHeight;
 			var lastPlayingFieldWidth, lastPlayingFieldHeight;
@@ -120,7 +122,19 @@
                     newShapes(shapes);
 					interval2 = setInterval(function(){ countDown() }, 1000);
 					interval1 = setInterval(function (){ moveShapes() }, 50);
+					interval4 = setInterval(function(){movePlayerImg(),200});
                 }
+            }
+			function movePlayerImg(){
+                firstSprite++;
+                if(firstSprite == 9)
+                    firstSprite = 0;
+				if(secondSprite == 8)
+					secondSprite =0;
+                var imgString1 = "url(../img/ninja/Run__00" + firstSprite + "p1.png)";
+                var imgString2 = "url(../img/robot/Run__00" + firstSprite + "p1.png)";
+                $("#player1").css("background-image",imgString1);
+                $("#player2").css("background-image",imgString2)
             }
 			
 			function countDown(){
@@ -130,6 +144,7 @@
 					socket.emit('timeUp', { matchID: matchID, score: points });
 					clearInterval(interval2);
 					clearInterval(interval1);
+					clearInverval(interval4);
 				}
 				else if (timeRemaining % shapeRequestInterval == 0){
 					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
@@ -231,6 +246,8 @@
 					var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points));
                     $("#player1").css('left', left);
                     $("#player2").css('left', left + (browserWidth / 2) - parseInt($('#player1').width()));
+					
+                   // $("#player2").css('left', left + (browserWidth / 2) - parseInt($('#player1').width()));
                 }
                 else {
                     //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#player2').width()) / 2));
@@ -280,6 +297,8 @@
         <div id="scoreBoard">
             <div class="player" id="player1">Player 1</div>
             <div class="player" id="player2">Player 2</div>
+			<div class="mudInMiddle">mud</div>
+			<div id="rope">rope</div>
         </div>
     </body>
 </html>

@@ -20,7 +20,6 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 }
 
 html{
-
      background-size:cover;
      background-image:url(../img/Backgrounds/WebsiteBackground.png) !important;
 }
@@ -85,7 +84,6 @@ html{
     border-style:solid;
 	clear:left;
     background:url(../img/Backgrounds/CanvasBackground.png);
-
 }
 
 #scoreBoard{

@@ -48,22 +48,26 @@ io.on('connection', function (socket) {
         player1Socket = socket;
 		player1ID = Date.now();
 		socket.emit('playerNum', 1);
+		socket.emit('teamNum', 1);
     }
 	else if (numOfClientsQueued == 1) {
         numOfClientsQueued++;
         player2Socket = socket;
 		player2ID = Date.now();
 		socket.emit('playerNum', 2);
+		socket.emit('teamNum', 2);
 	}
 	else if (numOfClientsQueued == 2) {
         numOfClientsQueued++;
         player3Socket = socket;
 		player3ID = Date.now();
 		socket.emit('playerNum', 3);
+		socket.emit('teamNum', 1);
 	}
     else {
 		var player4ID = Date.now();
 		socket.emit('playerNum', 4);
+		socket.emit('teamNum', 2);
         var match = {
 			matchID: "match:" + Date.now(),
 			team1: {
@@ -80,7 +84,7 @@ io.on('connection', function (socket) {
 		console.log(matches[numOfMatches - 1]['team1']['player1']['playerID']);
 
         var shapes = getShapes();
-		var targetLives = Math.floor(Math.random() * 5) + 1;
+		var targetLives = getTargetLives();
 		player1Socket.emit('newTargetShapeLives', targetLives);
 		player2Socket.emit('newTargetShapeLives', targetLives);
 		player3Socket.emit('newTargetShapeLives', targetLives);
@@ -106,12 +110,14 @@ io.on('connection', function (socket) {
 				player1Socket = player2Socket;
 				player2Socket = null;
 				player1Socket.emit('playerNum', 1);
+				socket.emit('teamNum', 1);
 			}
 			if (player3Socket != null){
 				console.log("player 3 pushed to player 2");
 				player2Socket = player3Socket;
 				player3Socket = null;
 				player2Socket.emit('playerNum', 2);
+				socket.emit('teamNum', 2);
 			}
 			numOfClientsQueued--;
 		}
@@ -123,6 +129,7 @@ io.on('connection', function (socket) {
 				player2Socket = player3Socket;
 				player3Socket = null;
 				player2Socket.emit('playerNum', 2);
+				socket.emit('teamNum', 2);
 			}
 			numOfClientsQueued--;
 		}
@@ -173,6 +180,9 @@ io.on('connection', function (socket) {
     socket.on('targetShapeClick', function (data) {
 		//console.log(data['matchID']);
         var match = getMatchByID(data['matchID']);
+		if (match == null){
+			return;
+		}
         var team = 0, opponentTeam = 0;
         if (match['team1']['player1']['socket'] == socket || match['team1']['player2']['socket'] == socket){
             team = 1;
@@ -184,10 +194,10 @@ io.on('connection', function (socket) {
         }
         match['team' + team]['player1']['socket'].emit('point');
 		match['team' + team]['player2']['socket'].emit('point');
-        match['team' + opponentTeam]['player1']['socket'].emit('losePoint', data['shapeID']); //check method
-		match['team' + opponentTeam]['player2']['socket'].emit('losePoint', data['shapeID']); // check method
+        match['team' + opponentTeam]['player1']['socket'].emit('losePoint'/*, data['shapeID']*/); //check method
+		match['team' + opponentTeam]['player2']['socket'].emit('losePoint'/*, data['shapeID']*/); // check method
         var shapes = getShapes();
-		var targetLives = Math.floor(Math.random() * 5) + 1;
+		var targetLives = getTargetLives();
         match['team' + team]['player1']['socket'].emit('newShapes', shapes);
 		match['team' + team]['player1']['socket'].emit('newTargetShapeLives', targetLives);
 		match['team' + team]['player2']['socket'].emit('newShapes', shapes);
@@ -203,7 +213,7 @@ io.on('connection', function (socket) {
 		newShapes = getShapes();
 		var match = getMatchByID(data['matchID']);
 		
-        var targetLives = Math.floor(Math.random() * 5) + 1;
+        var targetLives = getTargetLives();
         match['team1']['player1']['socket'].emit('newShapes', newShapes);
 		match['team1']['player1']['socket'].emit('newTargetShapeLives', targetLives);
 		match['team1']['player2']['socket'].emit('newShapes', newShapes);
@@ -289,9 +299,9 @@ io.on('connection', function (socket) {
 		}
 	});
 	
-    socket.on('win', function (matchID) {
+    socket.on('win', function (data) {
         var team = 0, opponentTeam = 0;
-		var match = getMatchByID(matchID);
+		var match = getMatchByID(data['matchID']);
 		if (match == null){
 			console.log("time up called on null match by player " + data['playerNum']);
 			return;
@@ -313,7 +323,7 @@ io.on('connection', function (socket) {
 		match['team' + team]['player2']['socket'].emit('win');
         match['team' + opponentTeam]['player1']['socket'].emit('lose');
 		match['team' + opponentTeam]['player2']['socket'].emit('lose');
-		matches.splice(getIndexOfMatchByID(matchID), 1);
+		matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 		numOfMatches--;
 		ensureSplice(296);
     });
@@ -356,7 +366,35 @@ function getIndexOfMatchByID(matchID){
 	return null;
 }
 
+//use for non-duplicatable target shapes
 function getShapes() {
+    var shapeCount = 1 + Math.round(Math.random() * shapesPerRequest);
+	//var shapeCount = 1;
+    var shapes = [];
+	var targetPicker = -1;
+    for (var i = 0; i < shapeCount; i++) {
+        shapes.push(getNewShape(i, targetPicker));
+		if (i == 0){
+			targetPicker = shapes[0]['picker'];
+		}
+    }
+
+    return shapes;
+}
+
+function getNewShape(i, targetPicker) {
+    var id = i;
+    var picker = targetPicker;
+	while (picker == targetPicker){
+		picker = Math.floor((Math.random() * 12));
+	}
+    var height = 40 + Math.floor((Math.random() * 110));
+
+    return { id: id, picker: picker, height: height};
+}
+
+//use for duplicatable target shapes
+/*function getShapes() {
     var shapeCount = 1 + Math.round(Math.random() * shapesPerRequest);
 	//var shapeCount = 1;
     var shapes = [];
@@ -373,4 +411,4 @@ function getNewShape(i) {
     var height = 40 + Math.floor((Math.random() * 110));
 
     return { id: id, picker: picker, height: height};
-}
+}*/

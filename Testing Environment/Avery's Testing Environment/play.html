@@ -8,14 +8,15 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var homePageURL = "http://192.168.0.3:4000";
+            var homePageURL = "http://10.14.5.144:4000";
 			var ipAddress;
             var socket = io.connect(homePageURL);
             var points = 0;
             var pointsToWin = 10;
-            var player = 1;
+            var player = 0;
+			var team = 0;
             var round = -1;
-			var timeRemaining = 6;
+			var timeRemaining = 60;
 			var shapeRequestInterval = 5;
             var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
             var actions = ["TAP!", "TOUCH!", "SWIPE!", "HOLD!"];
@@ -134,6 +135,12 @@
                 interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
             });
 
+			socket.on('teamNum', function(data){
+				team = data;
+				//console.log(team);
+				$('#teamNum').text(team);
+			});
+			
 			socket.on('playerNum', function(data){
 				player = data;
 				//console.log(player);
@@ -179,10 +186,7 @@
             });
 
 			socket.on('newTargetShapeLives', function(targetLives){
-				var hasMultilives = Math.floor(Math.random() * 10);
-				if (hasMultilives > 7){
-					targetShapeLives = targetLives;
-				}
+				targetShapeLives = targetLives;
 				console.log("tsl: " + targetShapeLives);
 				$("#targetLives").text(targetShapeLives);
 			});
@@ -262,7 +266,7 @@
                 points++;
                 repositionPlayers();
                 if (points == pointsToWin) {
-                    socket.emit('win', matchID);
+                    socket.emit('win', { matchID: matchID, playerNum: player });
                 }
             });
 			
@@ -372,7 +376,7 @@
             <p style="text-align:center">Time: </p>
           <p id="timer">3</p>-->
         <table style="margin:0 auto">
-				<tr><th>You are player: </th><td id="playerNum"></td></tr>
+				<tr><th>Team: </th><td id="teamNum"></td><th>Player: </th><td id="playerNum"></td></tr>
                 <tr><th>Timer: </th><td id="timer">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target: </th><td id="targetShape"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target Lives: </th><td id="targetLives"></td></tr>
             </table>
             </div>

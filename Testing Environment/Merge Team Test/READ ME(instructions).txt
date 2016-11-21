@@ -1,0 +1,13 @@
+to run the program
+step 1: install node.js
+step 2: open cmd.exe
+step 3: navigate to the folder containing server.js
+step 4: enter command:   node server.js
+step 5: open 2 browser(s)/tabs/windows and navigate each to "http://localhost:4000"
+
+
+current version notes:
+- when one player wins, simple alerts are displayed to the winner & loser with respective messages
+- clicking a shape will log it's id to the console
+- the target shape is currently only identifiable by the id ending in a 0, which is only made know after clicking it
+- styling sizes are currently staticly assigned values, rather than dynamically extracted from the browser

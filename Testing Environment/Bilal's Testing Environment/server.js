@@ -253,44 +253,41 @@ app.post('/signIn', function(req, res, next) {
     //console.log(req.body.password);
     var user = req.body.username;
     var pass = req.body.password;
-    //200 : success / 410 : username not found / 420 : password incorrect
+    //200 : success / 400 : invalid credentials / 410 : username exists (primary key violation)
     var response = "";
     
     var dbConn = new sql.Connection(config);
     
     dbConn.connect().then(function () {
-        console.log("db connection openned")
+        console.log("db connection openned");
         var request = new sql.Request(dbConn);
         //For testing display//
 //        request.query("select * from account").then(function (recordSet) {
 //            console.log(recordSet);
         
         //Validate credentials//
-        request.query("SELECT * FROM account WHERE username='" + user + "'").then(function (recordSet) {
-            if (recordSet.length == 0) {
-                response = "410";
+        
+//        request.query("SELECT * FROM account WHERE username='" + user + "'").then(function (recordSet) {
+//            if (recordSet.length == 0) {
+//                response = "410";
+//                console.log(response);
+//                res.end(response);
+//            }
+//        });
+        
+        request.query("SELECT * FROM account WHERE username='" + user + "' AND password='" + pass + "'").then(function (recordSet) {
+            if(recordSet.length > 0) {
+                //console.log(recordSet);
+                response = "200";
+                console.log(response);
+                res.end(response);
+            }else {
+                //console.log("No user info found");
+                response = "400";
                 console.log(response);
                 res.end(response);
             }
         });
-        
-        if (response == "") {
-            request.query("SELECT * FROM account WHERE username='" + user + "' AND password='" + pass + "'").then(function (recordSet) {
-                if(recordSet.length > 0) {
-                    //console.log(recordSet);
-                    response = "200";
-                    console.log(response);
-                    res.end(response);
-                }else {
-                    //console.log("No user info found");
-                    response = "420";
-                    console.log(response);
-                    res.end(response);
-                }
-            });
-        }
-        
-        
             console.log("db connection closed")
             dbConn.close();
         }).catch(function (err) {
@@ -302,3 +299,78 @@ app.post('/signIn', function(req, res, next) {
 //app.get('/test/:id', function(req, res, next) {
 //    console.log(req.params.id);
 //});
+
+// *************************************************************************************** //
+// ******************************** REGISTRATION PORTION ******************************** //
+app.post('/signUp', function(req, res, next) {
+    var fname = req.body.firstName;
+    var lname = req.body.lastName;
+    var uname = req.body.username;
+    var pass = req.body.password;
+    var teamid = null;
+    var response = "";
+    
+    var dbConn = new sql.Connection(config);
+    console.log("db connection openned");
+
+    dbConn.connect().then(function() {
+        var transaction = new sql.Transaction(dbConn);
+        transaction.begin().then(function() {
+            var request = new sql.Request(dbConn);
+            console.log("Transaction");
+            request.query("INSERT INTO account (username,fName,lName,password,teamid) VALUES ('" + uname + "','" + fname + "','" + lname + "','" + pass + "'," + teamid + ")")
+            .then(function() {
+                transaction.commit().then(function(recordset) {
+                    console.log("Affected Rows: " + request.rowsAffected);
+                    dbConn.close();
+                }).catch(function (err) {
+                    console.log("Error in Transaction Commit " + err);
+                    dbConn.close();
+            });
+        }).catch(function (err) {
+                console.log("Error in Transaction Begin " + err);
+                dbConn.close();
+            });
+        }).catch(function (err) {
+            console.log(err);
+            dbConn.close();
+        });
+
+        response = "200";
+        console.log(response);
+        res.end(response);
+
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+app.post('/usernameValidation', function(req, res, next) {
+    var uname = req.body.username;
+    var response = "";
+    
+    var dbConnV = new sql.Connection(config);
+    
+    dbConnV.connect().then(function() {
+        console.log("dbv connection openned");
+        
+        var requestV = new sql.Request(dbConnV);
+        // verify username uniqueness
+        requestV.query("SELECT * FROM account WHERE username='" + uname + "'").then(function (recordSetV) {
+            if (recordSetV.length != 0) {
+                response = "410";
+                console.log(response);
+                res.end(response);
+            } else {
+                response = "200";
+                console.log(response);
+                res.end(response);
+            }
+        });
+        
+        console.log("dbv connection closed");
+        dbConnV.close();
+    }).catch(function (err) {
+        console.log(err);
+    });
+});

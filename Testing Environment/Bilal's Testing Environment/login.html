@@ -50,10 +50,8 @@
                         success : function(result) {
                             if (result == "200") {
                                 window.location.assign("/MainMenu.html");
-                            } else if (result == "410") {
-                                $("#errorUser").text("Username doesn't exist!");
-                            } else if (result == "420") {
-                                $("#errorPass").text("Password Incorrect!");
+                            } else if (result == "400") {
+                                $("#errorPass").text("Invalid credentials!");
                             }
                         },
                         error : function(jqXHR, textStatus, err) {
@@ -92,7 +90,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <td></td>
+                    <td>
+                        <button type="button" onclick="window.location.assign('/Registration.html');">Register!</button>
+                    </td>
                     <td style="text-align: right">
                         <Input type="submit" value="Login"  style="margin-left: 0px"></Input>
                     </td>

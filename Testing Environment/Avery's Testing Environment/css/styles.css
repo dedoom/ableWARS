@@ -10,7 +10,7 @@ img { position: absolute; display: block; margin: 0px; border: none; padding: 0p
 /* Only edit this if you know what you are doing! */
 /*div { position: absolute; }*/
 
-#content-container { display: block; position: absolute; width: 100%; height: 100%; background:url(../img/layer_1.png); }
+#content-container { display: block; position: absolute; width: 100%; height: 100%; }
 
 #artboard_1 {
 	top: 0px;
@@ -33,7 +33,7 @@ html{
 	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	font-size: 100%;
 	text-align: center;
-	color:#030300;
+	color: #030300;
 }
 
 #instructions {
@@ -56,7 +56,7 @@ html{
 	height: 100%;
 	width: 100%;
 	text-align: center;
-	font-size: 500%;
+	font-size: 400%;
 }
 
 /* Add your custom CSS here */
@@ -99,7 +99,7 @@ html{
 	margin-top:20px !important;
 }
 
-#timer{
+#timer, #playerNum, #teamNum{
 	/*float: left;*/
 	font-size: 30pt;
 	text-align: center;
@@ -117,20 +117,6 @@ html{
   -moz-user-select: none;    
   -ms-user-select: none;      
   user-select: none;
-}
-
-.team{
-	position: absolute;
-    border-radius: 50%;
-    behavior: url(PIE.htc); /* remove if you don't care about IE8 */
-    width: 50px;
-    height: 50px;
-	margin-bottom: 10px !important;
-    background: yellow;
-    border: 4px solid red;
-    font-size: 10px;
-    line-height: 50px;
-    text-align: center;
 }
 
 #SISOButtons{
@@ -185,7 +171,7 @@ html{
     padding: 3px;
 }
 
-.player{
+.team{
 	position: absolute;
     border-radius: 50%;
     behavior: url(PIE.htc); /* remove if you don't care about IE8 */
@@ -195,16 +181,16 @@ html{
 	/*background: yellow;
     border: 4px solid red;*/   
     font-size: 10px;
-    line-height: 50px;
+    line-height: 120px;
     text-align: center;
     /*background-image: url(../img/ninja/Run__000.png);*/
 }
 
-#player2{
+#team2{
     background-image: url(../img/robot/Run__000p1.png);
 }
 
-#player1{
+#team1{
     background-image: url(../img/ninja/Run__000p1.png);
 }
 
@@ -225,6 +211,6 @@ html{
 	width: 600px;
 	position:absolute;
 	left:28%;
-	top:93%;
+	margin-top: 30px;
 	background-color:brown;
 }

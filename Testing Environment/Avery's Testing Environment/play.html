@@ -8,7 +8,7 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var homePageURL = "http://10.14.5.144:4000";
+            var homePageURL = "http://localhost:4000";
 			var ipAddress;
             var socket = io.connect(homePageURL);
             var points = 0;
@@ -41,7 +41,6 @@
 				lastPlayingFieldWidth = $('#playingField').width();
 				lastPlayingFieldHeight = $('#playingField').height();
                 $("#playingField").on("mousedown", "div", function (event) {
-					console.log(this.getAttribute("data-isTarget"));
                     if (this.id === round + "shape" + targetShape) {
                         var timestamp = Date.now();
 						var sID = this.id;
@@ -68,7 +67,7 @@
 				//resize
 				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#team1').outerHeight(true)));
 				$('#timer').css('margin-top', parseInt($('#timer').css('margin-bottom')));
-				$('#playingField').css("height", browserHeight - (parseInt($('#timer').outerHeight(true)) * 2) - parseInt($('#team1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
+				$('#playingField').css("height", browserHeight - (parseInt($('#timer').outerHeight(true)) * 3) - parseInt($('#team1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
 				//console.log("playingField height: " + $('#playingField').height());
 				$('#timer').css('margin-top', parseInt($('#timer').height()) / 2);
 				repositionPlayers();
@@ -119,12 +118,13 @@
 				waitingTagStrCount++;
 				waitingTagStrCount = waitingTagStrCount % 5;
 				var waitingTagStr = "Waiting for other players"
+				var waitingDots = "";
 				for (var i = 0; i < waitingTagStrCount; i++){
-					waitingTagStr = waitingTagStr + ".";
+					waitingDots = waitingDots + ".";
 				}
 				$('#playingField').empty();
 				console.log(waitingTagStrCount);
-				$('#playingField').append("<p style='display:block' id='waitingTag'>" + waitingTagStr + "</p>");
+				$('#playingField').append("<p style='display:block' id='waitingTag'>" + waitingTagStr + "</br>" + waitingDots + "</p>");
 			}
 			
             socket.on('startGame', function (data) {
@@ -177,7 +177,7 @@
                 var imgString1 = "url(../img/ninja/Run__00" + firstSprite + "p1.png)";
                 var imgString2 = "url(../img/robot/Run__00" + secondSprite + "p1.png)";
                 $("#team1").css("background-image", imgString1);
-                $("#team2").css("background-image", imgString2)
+                $("#team2").css("background-image", imgString2);
             }
 			
 			function countDown(){
@@ -187,7 +187,7 @@
 					$("#timer").text("Times Up");
 					clearInterval(interval2);
 					clearInterval(interval1);
-					clearInverval(interval4);
+					clearInterval(interval4);
 					//clearScreen();
 					socket.emit('timeUp', { matchID: matchID, score: points, playerNum: player });
 				}
@@ -198,13 +198,16 @@
 			}
 
             socket.on('newShapes', function (shapes) {
+				if (points >= 10 || points <= -10){
+					return;
+				}
 				$("#playingField").empty();
 				newShapes(shapes);
             });
 
 			socket.on('newTargetShapeLives', function(targetLives){
 				targetShapeLives = targetLives;
-				console.log("tsl: " + targetShapeLives);
+				//console.log("tsl: " + targetShapeLives);
 				$("#targetLives").text(targetShapeLives);
 			});
 			
@@ -213,7 +216,7 @@
 			}*/
 
 			function setTargetShape(shapes) {
-				console.log(targetShape);
+				//console.log(targetShape);
 			    $("#targetShape").empty();
 			    $("#targetShape").append("<div style='display:block' class='shapeTarget' ><img  src='../img/shapes/" + shapeImgs[shapes[targetShape]['picker']] + "'></div>");
 			}
@@ -302,18 +305,22 @@
 
             function repositionPlayers() {
                 //console.log(browserWidth);
-				if (player == 1) {
+				if (team == 1) {
 					//console.log("browserWidth: " + browserWidth + "\npos by points: " + ((browserWidth / (pointsToWin * 4)) * points) + "\nposition" + parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points)));
                     //var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#team1').width()) / 2));
 					var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points));
                     $("#team1").css('left', left);
                     $("#team2").css('left', left + (browserWidth / 2) - parseInt($('#team1').width()));
+					$('#rope').css('left', left + parseInt($('#team1').width()) / 2);
+					$('#rope').css('width', parseInt($("#team2").css('left')) - parseInt($("#team1").css('left')));
                 }
                 else {
                     //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#team2').width()) / 2));
 					var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - parseInt($('#team2').width()));
                     $("#team2").css('left', left);
                     $("#team1").css('left', left - (browserWidth / 2) + parseInt($('#team2').width()));
+					$('#rope').css('left', parseInt($("#team1").css('left')) + parseInt($('#team1').width()) / 2);
+					$('#rope').css('width', parseInt($("#team2").css('left')) - parseInt($("#team1").css('left')));
                 }
             }
 
@@ -393,7 +400,7 @@
             <p style="text-align:center">Time: </p>
           <p id="timer">3</p>-->
         <table style="margin:0 auto">
-				<tr><th>Team: </th><td id="teamNum"></td><th>Player: </th><td id="playerNum"></td></tr>
+				<tr><th>Team: </th><td id="teamNum"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Player: </th><td id="playerNum"></td></tr>
                 <tr><th>Timer: </th><td id="timer">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target: </th><td id="targetShape"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target Lives: </th><td id="targetLives"></td></tr>
             </table>
             </div>
@@ -404,7 +411,7 @@
             <div class="team" id="team1">Team 1</div>
             <div class="team" id="team2">Team 2</div>
 			<div class="mudInMiddle">mud</div>
-			<div id="rope">rope</div>
+			<div id="rope"></div>
         </div>
     </body>
 </html>

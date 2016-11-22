@@ -367,12 +367,14 @@
 				$(shape).children().css('width', $(shape).width());
 				if (parseInt($(shape).css('height')) <= 0){
 					clearInterval(interval1);
-					var shapeDivs = $('#playingField').children();
-					interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
 					$(shape).remove();
 					console.log($('#playingField').children().length);
 					if ($('#playingField').children().length <= 0){
 						displayEndScreen();
+					}
+					else {
+						var shapeDivs = $('#playingField').children();
+						interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
 					}
 				}
 			}

@@ -4,7 +4,6 @@
     <head>
         <title></title>
         <script src="javascript/jquery.js"></script> 
-        <script src="/socket.io/socket.io.js"></script>
         <!--<script src="javascript/gameplay.js"></script>-->
         <link rel="StyleSheet" href="css/styles.css" />
     </head>
@@ -29,8 +28,8 @@
 			
 		<div id="artboard_1">
                  
-            <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
-            <a href="Index.html"><div class="mainBtn IndexBtn"><img id="go_to_menu" src="../img/mmBtn.png"/></div></a>
+            <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="img/warBtn.png"/></div></a>
+            <a href="Index.html"><div class="mainBtn IndexBtn"><img id="go_to_menu" src="img/mmBtn.png"/></div></a>
         </div>
     </body>
 	
@@ -68,24 +67,21 @@
 		 	   
 		}
 		
-		 $(".mainBtn").mousedown(function () {
-       
+	$(".mainBtn").mousedown(function () {   
         if ($(this).hasClass("warBtn")) {
-            $(this).addClass("warClick");
-            GoToWar();
+            $(this).attr('src', "img/warBtnClick.png");
         }
         else if ($(this).hasClass("IndexBtn")) {
-            $(this).addClass("IndexClick");
-            GoToSettings();
+            $(this).attr('src', "img/mmBtnClick.png");
         }
     });
 	
     $(".mainBtn").mouseup(function () {
         if ($(this).hasClass("warBtn")) {
-            $(this).removeClass("warClick");
+            $(this).attr('src', "img/warBtn.png");
         }
         else if ($(this).hasClass("IndexBtn")) {
-            $(this).removeClass("IndexClick");
+            $(this).attr('src', "img/mmBtn.png");
         }       
     })
 		

@@ -194,8 +194,10 @@ html{
     background-image: url(../img/ninja/Run__000p1.png);
 }
 
-#HowToPlayText{
+#HowToPlay{
     text-align:center !important;
+	width: 90%;
+	margin: auto;
     font-size: 20pt !important;
     font-weight: bold !important;
 }
@@ -213,4 +215,47 @@ html{
 	left:28%;
 	margin-top: 30px;
 	background-color:brown;
+}
+
+.instructionsNextBackBtn{
+	width: 40%;
+	font-size: 15pt !important;
+    font-weight: bold !important;
+	border-radius: 5px;
+	border: 2px solid black;
+	background: lightblue; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(white, lightblue); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(white, lightblue); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(white, lightblue); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, lightblue); /* Standard syntax */
+}
+
+.instructionsNextBackBtn:hover{
+	width: 40%;
+	font-size: 15pt !important;
+    font-weight: bold !important;
+	border-radius: 5px;
+	border: 2px solid black;
+	background: skyblue; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(white, skyblue); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(white, skyblue); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(white, skyblue); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, skyblue); /* Standard syntax */
+}
+
+.instructionsNextBackBtn:active{
+	width: 40%;
+	font-size: 15pt !important;
+    font-weight: bold !important;
+	border-radius: 5px;
+	border: 2px solid black;
+	background: deepskyblue; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(white, deepskyblue); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(white, deepskyblue); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(white, deepskyblue); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, deepskyblue); /* Standard syntax */
+}
+
+.instructionsText{
+	width: 60%;
 }

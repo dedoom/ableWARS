@@ -134,6 +134,7 @@
                 matchID = data['matchID'];
 				playerID = data['playerID'];
 				//alert("Match #: " + matchID + "\nPlayer: " + player);
+				while(Date.now() < data['startTime']);
                 interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
             });
 
@@ -331,13 +332,13 @@
             });
 
             socket.on('winByDisconnect', function(){
-				//alert("You're opponent has disconnected from the match.\nYou win!!");
+				//alert("Your opponent has disconnected from the match.\nYou win!!");
 				endGameResult = "winDisconnect";
 				gameOver();
 			});
 			
 			socket.on('loseByTeamDisconnect', function(){
-				//alert("You're teammate has disconnected from the match.\nYou lose :(");
+				//alert("Your teammate has disconnected from the match.\nYou lose :(");
 				endGameResult = "loseDisconnect";
 				gameOver();
 			});
@@ -356,6 +357,9 @@
 			
 			function gameOver(){
 				clearInterval(interval1);
+				clearInterval(interval2);
+				clearInterval(interval4);
+				$('#timer').text("GameOver!");
 				var shapeDivs = $('#playingField').children();
 				interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
 			}
@@ -381,17 +385,66 @@
 			
 			function displayEndScreen(){
 				
-				alert(endGameResult);
+				//alert(endGameResult);
 				//window.location.replace(homePageURL);
-				
 				$('#playingField').empty();
 				//console.log(waitingTagStrCount);
 				
-				var yourHtml = '<a href="play.html">Play again</a>';
-				$("#playingField").append(yourHtml);
+				if (endGameResult == "win"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundWin'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("winBackgroundGradient");
+					$("#playingField").append("<div class='endGameResultMessage'>Win</div>");
+				}
+				else if (endGameResult == "lose"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundLose'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("loseBackgroundGradient");
+					$("#playingField").append("<div class='endGameResultMessage'>Lose</div>");
+				}
+				else if (endGameResult == "tie"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundTie'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("tieBackgroundGradient");
+					$("#playingField").append("<div class='endGameResultMessage'>Tie</div>");
+				}
+				else if (endGameResult == "winDisconnect"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundWin'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("winBackgroundGradient");
+					$("#playingField").append("<div class='disconnectMessage' id='disconnectMessage'>Your opponent has disconnected from the match</div>");
+					interval1 = setInterval(function(){ fadeDisconnectMessage() }, 100);
+					$("#playingField").append("<div class='endGameResultMessage'>Win</div>");
+				}
+				else if (endGameResult == "loseDisconnect"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundLose'/>");
+					$('#playingField').addClass("loseBackgroundGradient");
+					$("#playingField").append("<div class='disconnectMessage' id='disconnectMessage'>Your teammate has disconnected from the match</div>");
+					interval1 = setInterval(function(){ fadeDisconnectMessage() }, 100);
+					$("#playingField").append("<div class='endGameResultMessage'>Lose</div>");
+				}
 				
-				var yourHtml = '<a href="index.html">Return to main menu</a>';
-				$("#playingField").append(yourHtml);
+				
+				$("#playingField").append("<div class='endGameInfo'>Time Remaining: " + timeRemaining + "</div>");
+				var finalPoints = points;
+				if (points <= 0){
+					finalPoints = 0;
+				}
+				$("#playingField").append("<div class='endGameInfo'>Final Score: " + finalPoints + "</div>");
+				
+				$("#playingField").append("<div class='endGameButtons' id='endGameButtons'></div>");
+				$("#endGameButtons").append("<a href='play.html'><button class='endGameBtn'>Play again</button></a>");
+				$("#endGameButtons").append("<a href='index.html'><button class='endGameBtn'>Return to main menu</button></a>");
+			}
+			
+			var opacity = 2.0;
+			function fadeDisconnectMessage(){
+				opacity = opacity - 0.1;
+				$("#disconnectMessage").css('opacity', opacity);
+				if (opacity <= 0){
+					$("#disconnectMessage").remove();
+					clearInterval(interval1);
+				}
 			}
 			
 			/*socket.on('updatematchID', function(newmatchID){
@@ -418,7 +471,7 @@
             </div>
           
 
-        <div id="playingField"></div>
+        <div class="playingFieldGameBackground" id="playingField"></div>
         <div id="scoreBoard">
             <div class="team" id="team1">Team 1</div>
             <div class="team" id="team2">Team 2</div>

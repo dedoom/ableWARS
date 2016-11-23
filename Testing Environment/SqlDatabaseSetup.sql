@@ -7,7 +7,7 @@ GO
 
 CREATE TABLE dbo.PurchaseOrderDetail  
 (  
-    username varchar(30) NOT NULL  
+    username varchar(30) PRIMARY KEY NOT NULL  
     ,fName varchar(30) NOT NULL  
     ,lName varchar(30) NOT NULL  
     ,password varchar(30) NOT NULL  

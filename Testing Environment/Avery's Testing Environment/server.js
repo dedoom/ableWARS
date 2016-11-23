@@ -482,8 +482,8 @@ app.post('/signIn', function(req, res, next) {
 // *************************************************************************************** //
 // ******************************** REGISTRATION PORTION ******************************** //
 app.post('/signUp', function(req, res, next) {
-    var fname = null; //req.body.firstName;
-    var lname = null; //req.body.lastName;
+    var fname = req.body.firstName;
+    var lname = req.body.lastName;
     var uname = req.body.username;
     var pass = req.body.password;
     var teamid = null;

@@ -54,11 +54,6 @@
                         dataType : 'json',
                         success : function(result) {
                             if (result == "200") {
-								
-								/*
-									LOCAL STORAGE
-								*/
-								
                                 window.location.assign("/MainMenu.html");
                             } else if (result == "400") {
                                 $("#errorPass").text("Invalid credentials!");
@@ -73,7 +68,7 @@
         });
     </script>
     
-    <div id="RegCenter">
+    <div id="center">
         <br />
     <h2>Login Page</h2>
     <h4>Please enter your credentials</h4>

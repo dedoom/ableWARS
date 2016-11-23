@@ -26,35 +26,37 @@
             $("#SignUpForm").submit( function(e) {
                 e.preventDefault();
                 
-                $("#errFN").text("");
-                $("#errLN").text("");
+//                $("#errFN").text("");
+//                $("#errLN").text("");
                 $("#errUN").text("");
                 $("#errPassReg").text("");
                 
-                var fName = $("#txtFName").val();
-                var lName = $("#txtLName").val();
+//                var fName = $("#txtFName").val();
+//                var lName = $("#txtLName").val();
                 var uName = $("#txtUName").val();
                 var pass = $("#txtPassReg").val();
                 var passReType = $("#txtRePassReg").val();
                 
                 uName = uName.replace(/\s+/g, '');
-                var tempFN = fName.replace(/\s+/g, '');
-                var tempLN = lName.replace(/\s+/g, '');
+//                var tempFN = fName.replace(/\s+/g, '');
+//                var tempLN = lName.replace(/\s+/g, '');
                 
-                if (fName == "" || tempFN == "") {
-                    $("#errFN").text("First Name required!");
-                } else if (lName == "" || tempLN == "") {
-                    $("#errLN").text("Last Name required!");
-                } else if (uName == "") {
+//                if (fName == "" || tempFN == "") {
+//                    $("#errFN").text("First Name required!");
+//                } else if (lName == "" || tempLN == "") {
+//                    $("#errLN").text("Last Name required!");
+//                } else 
+                    if (uName == "") {
                     $("#errUN").text("Username required!");
                 } else if (pass == "" || pass.length < 6) {
                     $("#errPassReg").text("Password cannot be less than 6 characters");
                 } else if (pass != passReType) {
                     $("#errPassReg").text("Passwords do not MATCH!");
-                } else {
+                } 
+                else {
                     var userObj = {
-                        firstName : fName,
-                        lastName : lName,
+//                        firstName : fName,
+//                        lastName : lName,
                         username : uName,
                         password : pass,
                         teamid : null
@@ -108,6 +110,11 @@
                 dataType : 'json',
                 success : function(result) {
                     if (result == "200") {
+						
+						/*
+							LOCAL STORAGE
+						*/
+						
                         window.location.assign("/Login.html");
                     }
                 },
@@ -120,12 +127,13 @@
         
     </script>
     
-    <div id="center">
+    <div id="RegCenter">
     
         <h2>Registration Page</h2>
         <p><i>Each field is mandatory.</i> </p>
         <form id="SignUpForm">
             <table border="0" align="center">
+<!--
                 <tr>
                     <td>First Name :<br />&nbsp;</td>
                     <td>
@@ -142,6 +150,7 @@
                         <Label class="lbl" ID="errLN"></Label>
                     </td>
                 </tr>
+-->
                 <tr>
                     <td>Username :<br />&nbsp;</td>
                     <td>

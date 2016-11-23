@@ -92,6 +92,9 @@ html{
     border-color:black;
     border-style:solid;
 	clear:left;
+}
+
+.playingFieldGameBackground{
 	background:url(../img/Backgrounds/CanvasBackground.png);
 }
 
@@ -99,7 +102,7 @@ html{
 	margin-top:20px !important;
 }
 
-#timer, #playerNum, #teamNum{
+#timer, #playerNum, #teamNum, #targetLives{
 	/*float: left;*/
 	font-size: 30pt;
 	text-align: center;
@@ -258,4 +261,112 @@ html{
 
 .instructionsText{
 	width: 60%;
+}
+
+.endGameResultMessage{
+	width: 90%;
+	margin: auto;
+	text-align: center;
+	font-size: 500%;
+	margin-top: 5%;
+}
+
+.disconnectMessage{
+	position: absolute;
+	width: 90%;
+	margin: auto;
+	background-color: black;
+	color: grey;
+	font-size: 200%;
+	text-align: center;
+	border-radius: 10px;
+}
+
+.endGameButtons{
+	width: 100%;
+	margin: auto;
+	margin-top: 10%;
+}
+
+.endGameBtn{
+	width: 40%;
+	margin: auto;
+	margin-left: 5%;
+	margin-right: 5%;
+	font-size: 15pt !important;
+    font-weight: bold !important;
+	border-radius: 5px;
+	border: 2px solid black;
+	background: lightblue; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(white, lightblue); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(white, lightblue); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(white, lightblue); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, lightblue); /* Standard syntax */
+}
+
+.endGameBtn:hover{
+	width: 40%;
+	margin: auto;
+	margin-left: 5%;
+	margin-right: 5%;
+	font-size: 15pt !important;
+    font-weight: bold !important;
+	border-radius: 5px;
+	border: 2px solid black;
+	background: skyblue; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(white, skyblue); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(white, skyblue); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(white, skyblue); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, skyblue); /* Standard syntax */
+}
+
+.endGameBtn:active{
+	width: 40%;
+	margin: auto;
+	margin-left: 5%;
+	margin-right: 5%;
+	font-size: 15pt !important;
+    font-weight: bold !important;
+	border-radius: 5px;
+	border: 2px solid black;
+	background: deepskyblue; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(white, deepskyblue); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(white, deepskyblue); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(white, deepskyblue); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, deepskyblue); /* Standard syntax */
+}
+
+.endGameBackground{
+	position: absolute;
+}
+
+.winBackgroundGradient{
+	background: lime; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, lime, white); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, lime, white); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, lime, white); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, lime, white); /* Standard syntax */
+}
+
+.loseBackgroundGradient{
+	background: maroon; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, maroon, white); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, maroon, white); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, maroon, white); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, maroon, white); /* Standard syntax */
+}
+
+.tieBackgroundGradient{
+	background: orange; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, orange, white); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, orange, white); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, orange, white); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, orange, white); /* Standard syntax */
+}
+
+.endGameInfo{
+	width: 90%;
+	margin: auto;
+	font-size: 150%;
+	text-align: center;
 }

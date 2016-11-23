@@ -117,7 +117,7 @@
 			function appendWaitingTag(){
 				waitingTagStrCount++;
 				waitingTagStrCount = waitingTagStrCount % 5;
-				var waitingTagStr = "Waiting for other players"
+				var waitingTagStr = "Waiting for other players";
 				var waitingDots = "";
 				for (var i = 0; i < waitingTagStrCount; i++){
 					waitingDots = waitingDots + ".";
@@ -378,10 +378,21 @@
 			}
 			
 			function displayEndScreen(){
-				alert(endGameResult);
-				$('#playingField').empty();
-				$("#playingField").text("Please click on the link below to play again");
-				var yourHtml = '<a href="play.html">';
+			
+			var myWindow = window.open("", "myWindow", "width=800,height=800");   // Opens a new window
+            myWindow.document.write("<p>This is 'myWindow'</p>");   // Text in the new window
+            myWindow.opener.document.write("<p>This is the source window!</p>");  // Text in the window that created the new window
+				//alert(endGameResult);
+				//window.location.replace(homePageURL);
+				//////
+				//$('#playingField').empty();
+				//console.log(waitingTagStrCount);
+				//$('#playingField').append("<p style='display:block' id='waitingTag'>" + waitingTagStr + "</br>" + waitingDots + "</p>");
+				////
+			
+		
+				//$("#playingField").text("Please click on the link below to play again");
+				//var yourHtml = '<a href="play.html">';
 				$("#playingField").html(yourHtml);
 				//document.getElementById('playingField').innerHTML = "Your HTML here";
 				//document.write("<p>If you wana play again please clink on the following link: " + txt.link("http://localhost/play") + "</p>");

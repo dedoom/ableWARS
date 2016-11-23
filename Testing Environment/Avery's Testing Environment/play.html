@@ -380,31 +380,18 @@
 			}
 			
 			function displayEndScreen(){
-				//alert(endGameResult);
-				//window.location.replace(homePageURL);
 				
-				/*var myWindow = window.open("", "myWindow", "width=800,height=800");   // Opens a new window
-				myWindow.document.write("<p>This is where all the player stat will be displayed</p>");   // Text in the new window
-				myWindow.document.write("<p>This is where all the player stat will be displayed</p>"); 
-				myWindow.opener.document.write("<p>This is the source window!</p>");  // Text in the window that created the new window*/
 				alert(endGameResult);
 				//window.location.replace(homePageURL);
 				
 				$('#playingField').empty();
 				//console.log(waitingTagStrCount);
-				$('#playingField').append("<p>Test end screen</p>");
 				
-				$("#playingField").append("<p>Click on the following link to play again</p>");
 				var yourHtml = '<a href="play.html">Play again</a>';
 				$("#playingField").append(yourHtml);
 				
-				$("#playingField").append("<p>Click on the following link to return to main menu</p>");
 				var yourHtml = '<a href="index.html">Return to main menu</a>';
 				$("#playingField").append(yourHtml);
-				//document.getElementById('playingField').innerHTML = "Your HTML here";
-				//document.write("<p>If you wana play again please clink on the following link: " + txt.link("http://localhost/play") + "</p>");
-				//document.write("<p>If you want to go back to the main page, please click on the following link: " + txt.link("http://localhost/Index") + "</p>");
-				//window.location.replace(homePageURL);
 			}
 			
 			/*socket.on('updatematchID', function(newmatchID){

@@ -64,17 +64,17 @@
             <div class="txtBtn profileBtn" id="profile">
                 Profile
             </div>-->
-			<a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png"/></a>
-            <a href="Profile.html"><img class="mainBtn profileBtn" id="profile" src="img/profileBtn.png"/></a>
-            <a href="Instructions.html"><img class="mainBtn instructionsBtn" id="instructions" src="img/instructionsBtn.png"/></a>
+			<a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="../img/warBtn.png"/></a>
+            <a href="Profile.html"><img class="mainBtn profileBtn" id="profile" src="../img/profileBtn.png"/></a>
+            <a href="Instructions.html"><img class="mainBtn instructionsBtn" id="instructions" src="../img/instructionsBtn.png"/></a>
         </div>
     </div>
 	
 	<div id="SISOButtons">
         <label id="welcomeMessage">Login to access the game! Don't have an account? Register Now!</label>
         <div id="btnContainer">
-            <a href="login.html"><div class="accBtn" id="logInButton">Log In</div></a>
-            <a href="Registration.html"><div class="accBtn" id="registerButton">Register</div></a>
+            <div class="accBtn" id="logInButton">   Log In</div>
+            <div class="accBtn" id="registerButton">Register</div>   
         </div>  
     </div>
 </body>
@@ -99,25 +99,25 @@
     $(".mainBtn").mousedown(function () {
        
         if ($(this).hasClass("warBtn")) {
-            $(this).attr('src', "img/warBtnClick.png");
+            $(this).attr('src', "../img/warBtnClick.png");
         }
         else if ($(this).hasClass("profileBtn")) {
-            $(this).attr('src', "img/profileBtnClick.png");
+            $(this).attr('src', "../img/profileBtnClick.png");
         }
         else if ($(this).hasClass("instructionsBtn")) {
-            $(this).attr('src', "img/instructionsBtnClick.png");
+            $(this).attr('src', "../img/instructionsBtnClick.png");
         }
     });
 	
     $(".mainBtn").mouseup(function () {
         if ($(this).hasClass("warBtn")) {
-            $(this).attr('src', "img/warBtn.png");
+            $(this).attr('src', "../img/warBtn.png");
         }
         else if ($(this).hasClass("profileBtn")) {
-            $(this).attr('src', "img/profileBtn.png");
+            $(this).attr('src', "../img/profileBtn.png");
         }
         else if ($(this).hasClass("instructionsBtn")) {
-            $(this).attr('src', "img/instructionsBtn.png");
+            $(this).attr('src', "../img/instructionsBtn.png");
         }
     })
 </script>

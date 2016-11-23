@@ -5,7 +5,7 @@ CREATE DATABASE AbleWars;
 use [AbleWars]
 GO
 
-CREATE TABLE dbo.PurchaseOrderDetail  
+CREATE TABLE dbo.account 
 (  
     username varchar(30) PRIMARY KEY NOT NULL  
     ,fName varchar(30) NOT NULL  

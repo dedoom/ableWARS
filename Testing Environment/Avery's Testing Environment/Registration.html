@@ -18,6 +18,8 @@
     
     <script>
         $(document).ready(function() {
+            if (sessionStorage.userId)
+                window.location.assign("/index.html");
             
             $("#txtUName").on("keydown", function (e) {
                 return e.which !== 32;
@@ -26,26 +28,27 @@
             $("#SignUpForm").submit( function(e) {
                 e.preventDefault();
                 
-                $("#errFN").text("");
-                $("#errLN").text("");
+//                $("#errFN").text("");
+//                $("#errLN").text("");
                 $("#errUN").text("");
                 $("#errPassReg").text("");
                 
-                var fName = $("#txtFName").val();
-                var lName = $("#txtLName").val();
+                //var fName = $("#txtFName").val();
+                //var lName = $("#txtLName").val();
                 var uName = $("#txtUName").val();
                 var pass = $("#txtPassReg").val();
                 var passReType = $("#txtRePassReg").val();
                 
                 uName = uName.replace(/\s+/g, '');
-                var tempFN = fName.replace(/\s+/g, '');
-                var tempLN = lName.replace(/\s+/g, '');
-                
-                if (fName == "" || tempFN == "") {
-                    $("#errFN").text("First Name required!");
-                } else if (lName == "" || tempLN == "") {
-                    $("#errLN").text("Last Name required!");
-                } else if (uName == "") {
+//                var tempFN = fName.replace(/\s+/g, '');
+//                var tempLN = lName.replace(/\s+/g, '');
+//                
+//                if (fName == "" || tempFN == "") {
+//                    $("#errFN").text("First Name required!");
+//                } else if (lName == "" || tempLN == "") {
+//                    $("#errLN").text("Last Name required!");
+//                } else 
+                    if (uName == "") {
                     $("#errUN").text("Username required!");
                 } else if (pass == "" || pass.length < 6) {
                     $("#errPassReg").text("Password cannot be less than 6 characters");
@@ -53,8 +56,8 @@
                     $("#errPassReg").text("Passwords do not MATCH!");
                 } else {
                     var userObj = {
-                        firstName : fName,
-                        lastName : lName,
+//                        firstName : fName,
+//                        lastName : lName,
                         username : uName,
                         password : pass,
                         teamid : null
@@ -71,7 +74,7 @@
 						//			change localhost to IP
 						//--------------------------------------------------------------------------
 						//--------------------------------------------------------------------------
-                        url : 'http://localhost:4000/usernameValidation',
+                        url : '/usernameValidation',
                         type : 'POST',
                         data : jsonValidate,
                         contentType : 'application/json',
@@ -101,13 +104,14 @@
 				//			change localhost to IP
 				//--------------------------------------------------------------------------
 				//--------------------------------------------------------------------------
-                url : 'http://localhost:4000/signUp',
+                url : '/signUp',
                 type : 'POST',
                 data : jsonUserObj,
                 contentType : 'application/json',
                 dataType : 'json',
                 success : function(result) {
                     if (result == "200") {
+                        sessionStorage.userId = userObj.username;
                         window.location.assign("/Login.html");
                     }
                 },
@@ -120,12 +124,13 @@
         
     </script>
     
-    <div id="center">
+    <div id="RegCenter">
     
         <h2>Registration Page</h2>
         <p><i>Each field is mandatory.</i> </p>
         <form id="SignUpForm">
             <table border="0" align="center">
+<!--
                 <tr>
                     <td>First Name :<br />&nbsp;</td>
                     <td>
@@ -142,6 +147,7 @@
                         <Label class="lbl" ID="errLN"></Label>
                     </td>
                 </tr>
+-->
                 <tr>
                     <td>Username :<br />&nbsp;</td>
                     <td>

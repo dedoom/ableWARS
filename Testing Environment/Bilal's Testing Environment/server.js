@@ -18,7 +18,7 @@ var express = require('express'),
     server = require('http').Server(app),
     io = require('socket.io').listen(server),
     path = require('path'),
-	bodyParser = require("body-parser"),
+	bodyParser = require('body-parser'),
     sql = require('mssql');
 	
 //database specific info
@@ -43,6 +43,7 @@ var player3ID;
 var shapesPerRequest = 5;
 
 app.use(express.static(path.join(__dirname + '/')));
+app.use(bodyParser.json({extend:true}))
 
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/index.html');
@@ -101,10 +102,11 @@ io.on('connection', function (socket) {
 		player3Socket.emit('newTargetShapeLives', targetLives);
         socket.emit('newTargetShapeLives', targetLives);
 		
-        player1Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player1ID });
-		player2Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player2ID });
-		player3Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player3ID });
-		socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player4ID });
+		var startTime = Date.now() + 2000;
+        player1Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player1ID, startTime: startTime });
+		player2Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player2ID, startTime: startTime });
+		player3Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player3ID, startTime: startTime });
+		socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player4ID, startTime: startTime });
 		
 		numOfClientsQueued = 0;
 		player1Socket = null;
@@ -257,7 +259,7 @@ io.on('connection', function (socket) {
 	socket.on('timeUp', function(data){
 		var matchIndex = getIndexOfMatchByID(data['matchID']);
 		var match = getMatchByID(data['matchID']);
-		console.log("player" + data['playerNum'] + "emit tie");
+		console.log("player " + data['playerNum'] + " emit tie");
 		if (match == null){
 			console.log("time up called on null match by player " + data['playerNum']);
 			return;
@@ -281,28 +283,28 @@ io.on('connection', function (socket) {
 		matches[matchIndex]['team' + team]['score'] = score;
 		if (matches[matchIndex]['team1']['score'] > -11 && matches[matchIndex]['team2']['score'] > -11) {
 			if (matches[matchIndex]['team1']['score'] > matches[matchIndex]['team2']['score']){
-				match['team' + opponentTeam]['player1']['socket'].emit('lose');
-				match['team' + opponentTeam]['player2']['socket'].emit('lose');
-				match['team' + team]['player1']['socket'].emit('win');
-				match['team' + team]['player2']['socket'].emit('win');
+				match['team2']['player1']['socket'].emit('lose');
+				match['team2']['player2']['socket'].emit('lose');
+				match['team1']['player1']['socket'].emit('win');
+				match['team1']['player2']['socket'].emit('win');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(256);
 			}
 			else if (matches[matchIndex]['team1']['score'] < matches[matchIndex]['team2']['score']){
-				match['team' + opponentTeam]['player1']['socket'].emit('win');
-				match['team' + opponentTeam]['player2']['socket'].emit('win');
-				match['team' + team]['player1']['socket'].emit('lose');
-				match['team' + team]['player2']['socket'].emit('lose');
+				match['team1']['player1']['socket'].emit('win');
+				match['team1']['player2']['socket'].emit('win');
+				match['team2']['player1']['socket'].emit('lose');
+				match['team2']['player2']['socket'].emit('lose');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(265);
 			}
 			else {
-				match['team' + opponentTeam]['player1']['socket'].emit('tie');
-				match['team' + opponentTeam]['player2']['socket'].emit('tie');
-				match['team' + team]['player1']['socket'].emit('tie');
-				match['team' + team]['player2']['socket'].emit('tie');
+				match['team1']['player1']['socket'].emit('tie');
+				match['team1']['player2']['socket'].emit('tie');
+				match['team2']['player1']['socket'].emit('tie');
+				match['team2']['player2']['socket'].emit('tie');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(274);
@@ -481,8 +483,8 @@ app.post('/signIn', function(req, res, next) {
 // *************************************************************************************** //
 // ******************************** REGISTRATION PORTION ******************************** //
 app.post('/signUp', function(req, res, next) {
-    var fname = req.body.firstName;
-    var lname = req.body.lastName;
+    var fname = null; //req.body.firstName;
+    var lname = null; //req.body.lastName;
     var uname = req.body.username;
     var pass = req.body.password;
     var teamid = null;

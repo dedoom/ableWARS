@@ -8,7 +8,7 @@
             height: 26px;
         }
     </style>
-    <link rel="StyleSheet" href="../loginStyle.css" />
+    <link rel="StyleSheet" href="css/styles.css" />
     <!--<script src="/verify.js"></script>-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
@@ -18,6 +18,9 @@
     
     <script>
         $(document).ready(function() {
+            
+            if (sessionStorage.userId)
+                window.location.assign("/index.html");
             
             $("#form1").submit( function(e) {
                 e.preventDefault();
@@ -44,7 +47,7 @@
                     $.ajax({
 					//--------------------------------------------------------------------------
 					//--------------------------------------------------------------------------
-					//			change localhost to ip
+					//			change localhost to IP
 					//--------------------------------------------------------------------------
 					//--------------------------------------------------------------------------
                         url : 'http://localhost:4000/signIn',
@@ -54,7 +57,8 @@
                         dataType : 'json',
                         success : function(result) {
                             if (result == "200") {
-                                window.location.assign("/MainMenu.html");
+                                sessionStorage.userId = user;
+                                window.location.assign("/index.html");
                             } else if (result == "400") {
                                 $("#errorPass").text("Invalid credentials!");
                             }
@@ -68,7 +72,7 @@
         });
     </script>
     
-    <div id="center">
+    <div id="RegCenter">
         <br />
     <h2>Login Page</h2>
     <h4>Please enter your credentials</h4>

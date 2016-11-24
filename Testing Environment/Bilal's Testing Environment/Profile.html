@@ -1,21 +1,97 @@
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title></title>
-        <script src="javascript/jquery.js"></script> 
-        <script src="/socket.io/socket.io.js"></script>
-        <!--<script src="javascript/gameplay.js"></script>-->
-        <link rel="StyleSheet" href="css/styles.css" />
-    </head>
-    <body>
-        <div id="SISOButtons" class="SISOAlt">
-            <label id="welcomeMessage">Done for today?</label>
-            <div id="btnContainer">
-                <div class="accBtn" id="logoutButton">Sign Out</div>
-            </div>
+<head>
+    <title></title>
+    <script src="javascript/jquery.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <!--<script src="javascript/gameplay.js"></script>-->
+    <link rel="StyleSheet" href="css/styles.css" />
+</head>
+<body>
+    <div id="SISOButtons" class="SISOAlt">
+        <label id="welcomeMessage">Done for today, </label>
+        <div class="btnContainer">
+            <div class="accBtn" id="logoutButton" onclick="signOut()">Sign Out</div>
         </div>
+    </div>
+    <br />
+    <p id="pageHeader">Profile</p>
+    <div id="HowToPlayText">
+        <p>We should add some useful information to this page.</p>
         <br />
-        <p id="pageHeader">Profile</p>
-    </body>
+    </div>
+
+    <div id="artboard_1">
+
+        <a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png" /></a>
+        <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png" /></a>
+    </div>
+</body>
+
+<script>
+		var browserWidth, browserHeight;
+
+		$(document).ready(function(){
+            if (!sessionStorage.userId)
+                    window.location.assign("/index.html");
+            $('#welcomeMessage').append('' + sessionStorage.userId + '?');
+            
+			sizeComponentsToBrowser();
+		});
+
+		$(window).resize(function(){
+			sizeComponentsToBrowser();
+		});
+
+		function sizeComponentsToBrowser() {
+		    browserWidth = $(window).width();
+		    browserHeight = $(window).height();
+
+		    $('#able_wars_').width(browserWidth * 0.7);
+		    $('#able_wars_').css('margin-left', browserWidth * 0.15);
+		    $('#able_wars_').css('margin-top', parseFloat($('#able_wars_').height()) / 8);
+		    $('#able_wars_').css('margin-bottom', parseFloat($('#able_wars_').height()) / 8);
+		    $('#able_wars_').css('font-size', $('#able_wars_').height() * 0.9);
+
+
+		    $('#go_to_war').css('width', browserWidth / 3);
+		    $('#go_to_war').css('margin-left', browserWidth / 3);
+		    $('#go_to_war').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
+		    $('#go_to_war').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
+
+		    $('#go_to_menu').css('width', browserWidth / 3);
+		    $('#go_to_menu').css('margin-left', browserWidth / 3);
+		    $('#go_to_menu').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
+		    $('#go_to_menu').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
+
+		}
+
+	$(".mainBtn").mousedown(function () {   
+        if ($(this).hasClass("warBtn")) {
+            $(this).attr('src', "img/warBtnClick.png");
+        }
+        else if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtnClick.png");
+        }
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("warBtn")) {
+            $(this).attr('src', "img/warBtn.png");
+        }
+        else if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtn.png");
+        }       
+    })
+
+    function signOut() {
+            sessionStorage.clear();
+            window.location.assign("/index.html");
+        }
+</script>
 </html>
+
+
+
+

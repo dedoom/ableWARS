@@ -8,7 +8,7 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var homePageURL = "http://localhost:4000";
+            var homePageURL = "http://192.168.0.3:4000";
 			var ipAddress;
             var socket = io.connect(homePageURL);
             var points = 0;
@@ -359,9 +359,9 @@
 				clearInterval(interval1);
 				clearInterval(interval2);
 				clearInterval(interval4);
-				$('#timer').text("GameOver!");
 				var shapeDivs = $('#playingField').children();
 				interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
+				$('#timer').text("GameOver!");
 			}
 			
 			function fadeOutShape(shape){

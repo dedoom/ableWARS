@@ -158,7 +158,7 @@ html{
     float: right;
 }
 
-.btnContainer{
+#btnContainer{
     margin-left:auto;
     margin-right: auto;
     min-width: inherit; 

@@ -18,7 +18,7 @@ var express = require('express'),
     server = require('http').Server(app),
     io = require('socket.io').listen(server),
     path = require('path'),
-	bodyParser = require('body-parser'),
+	bodyParser = require("body-parser"),
     sql = require('mssql');
 	
 //database specific info
@@ -26,7 +26,7 @@ var config = {
         server: 'localhost',
         database: 'AbleWars',
         user: 'able',
-        password: 'password',
+        password: '5hXmvneh',
         port: 1433
     };
 
@@ -85,11 +85,11 @@ io.on('connection', function (socket) {
 			team1: {
 				player1: { playerID: player1ID, socket: player1Socket, targetTimestamp: 0 }, 
 				player2: { playerID: player3ID, socket: player3Socket, targetTimestamp: 0 },
-				score: -11},
+				score: -1000},
 			team2: {
 				player1: {playerID: player2ID, socket: player2Socket, targetTimestamp: 0 },
 				player2: {playerID: player4ID, socket: socket, targetTimestamp: 0 },
-				score: -11},
+				score: -1000},
 			gameOver: false};
 		matches.push(match);
         numOfMatches++;
@@ -102,7 +102,7 @@ io.on('connection', function (socket) {
 		player3Socket.emit('newTargetShapeLives', targetLives);
         socket.emit('newTargetShapeLives', targetLives);
 		
-		var startTime = Date.now() + 2000;
+		var startTime = Date.now() + 4000;
         player1Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player1ID, startTime: startTime });
 		player2Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player2ID, startTime: startTime });
 		player3Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player3ID, startTime: startTime });
@@ -281,8 +281,9 @@ io.on('connection', function (socket) {
 				opponentTeam = 1;
 			}
 		matches[matchIndex]['team' + team]['score'] = score;
-		if (matches[matchIndex]['team1']['score'] > -11 && matches[matchIndex]['team2']['score'] > -11) {
+		if (matches[matchIndex]['team1']['score'] > -999 && matches[matchIndex]['team2']['score'] > -999) {
 			if (matches[matchIndex]['team1']['score'] > matches[matchIndex]['team2']['score']){
+				console.log("team1: " + matches[matchIndex]['team1']['score'] + ", team2: " + matches[matchIndex]['team2']['score']);
 				match['team2']['player1']['socket'].emit('lose');
 				match['team2']['player2']['socket'].emit('lose');
 				match['team1']['player1']['socket'].emit('win');
@@ -292,10 +293,10 @@ io.on('connection', function (socket) {
 				ensureSplice(256);
 			}
 			else if (matches[matchIndex]['team1']['score'] < matches[matchIndex]['team2']['score']){
-				match['team1']['player1']['socket'].emit('win');
-				match['team1']['player2']['socket'].emit('win');
-				match['team2']['player1']['socket'].emit('lose');
-				match['team2']['player2']['socket'].emit('lose');
+				match['team2']['player1']['socket'].emit('win');
+				match['team2']['player2']['socket'].emit('win');
+				match['team1']['player1']['socket'].emit('lose');
+				match['team1']['player2']['socket'].emit('lose');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(265);
@@ -483,8 +484,8 @@ app.post('/signIn', function(req, res, next) {
 // *************************************************************************************** //
 // ******************************** REGISTRATION PORTION ******************************** //
 app.post('/signUp', function(req, res, next) {
-    var fname = null; //req.body.firstName;
-    var lname = null; //req.body.lastName;
+    var fname = req.body.firstName;
+    var lname = req.body.lastName;
     var uname = req.body.username;
     var pass = req.body.password;
     var teamid = null;
@@ -526,6 +527,12 @@ app.post('/signUp', function(req, res, next) {
 });
 
 app.post('/usernameValidation', function(req, res, next) {
+	if (req == null){
+		console.log("req null");
+	}
+	if (req.body == null){
+		console.log("req null");
+	}
     var uname = req.body.username;
     var response = "";
     
@@ -553,4 +560,15 @@ app.post('/usernameValidation', function(req, res, next) {
     }).catch(function (err) {
         console.log(err);
     });
+});
+
+// *************************************************************************************** //
+// ******************************** STATISTICS PORTION ******************************** //
+// username, 
+app.post('getStats', function(req, res, next) {
+    var username = req.body.username;
+    var response = {
+        uname : username,
+        
+    }
 });

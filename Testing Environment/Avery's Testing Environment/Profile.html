@@ -10,9 +10,9 @@
 </head>
 <body>
     <div id="SISOButtons" class="SISOAlt">
-        <label id="welcomeMessage">Done for today?</label>
-        <div id="btnContainer">
-            <div class="accBtn" id="logoutButton">Sign Out</div>
+        <label id="welcomeMessage">Done for today, </label>
+        <div class="btnContainer">
+            <div class="accBtn" id="logoutButton" onclick="signOut()">Sign Out</div>
         </div>
     </div>
     <br />
@@ -33,6 +33,10 @@
 		var browserWidth, browserHeight;
 
 		$(document).ready(function(){
+            if (!sessionStorage.userId)
+                    window.location.assign("/index.html");
+            $('#welcomeMessage').append('' + sessionStorage.userId + '?');
+            
 			sizeComponentsToBrowser();
 		});
 
@@ -81,6 +85,10 @@
         }       
     })
 
+    function signOut() {
+            sessionStorage.clear();
+            window.location.assign("/index.html");
+        }
 </script>
 </html>
 

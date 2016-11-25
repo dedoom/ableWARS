@@ -21,8 +21,8 @@ GO
 
 -- Creating table 'Statistics'
 CREATE TABLE [dbo].[Statistics] (
-    [accountStatistics] int IDENTITY(1,1) NOT NULL,
-    [username] nvarchar(max)  NOT NULL,
+    [accountStatistics] int IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    [username] varchar(30)  NOT NULL,
     [wins] int  NOT NULL,
 	[losses] int NOT NULL,
 	[fastestWin] int Null,
@@ -31,30 +31,13 @@ CREATE TABLE [dbo].[Statistics] (
 );
 GO
 
-CREATE TABLE [dbo].[Account] (
-    [username] nvarchar(max) NOT NULL,
-    [fname] nvarchar(max)  NULL,
-    [lname] nvarchar(max)  NULL,
-	[password] nvarchar(max) NOT NULL,
-	[teamid] nvarchar(max) NULL
+CREATE TABLE [dbo].[account] (
+    [username] varchar(30) NOT NULL,
+    [fname] varchar(30)  NULL,
+    [lname] varchar(30)  NULL,
+	[password] varchar(30) NOT NULL,
+	[teamid] varchar(10) NULL
 );
-GO
-
-
-
--- --------------------------------------------------
--- Creating all PRIMARY KEY constraints
--- --------------------------------------------------
-
--- Creating primary key on [CountryId] in table 'Countries'
-ALTER TABLE [dbo].[Statistics]
-ADD CONSTRAINT [PK_Statistics]
-    PRIMARY KEY CLUSTERED ([accountStatistics] ASC);
-GO
-
-ALTER TABLE [dbo].[Accounts]
-ADD CONSTRAINT [PK_accounts]
-    PRIMARY KEY CLUSTERED ([username] ASC);
 GO
 
 -- --------------------------------------------------
@@ -62,17 +45,10 @@ GO
 -- --------------------------------------------------
 
 -- Creating foreign key 
-ALTER TABLE [dbo].[Account]
-ADD CONSTRAINT [FK_Stats]
-    FOREIGN KEY ([StatisticsUsername])
-    REFERENCES [dbo].[Statistics]
+ALTER TABLE [dbo].[Statistics]
+ADD CONSTRAINT [FK_User]
+    FOREIGN KEY ([username])
+    REFERENCES [dbo].[account]
         ([username])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
-
-
-
-
--- --------------------------------------------------
--- Script has ended
--- --------------------------------------------------

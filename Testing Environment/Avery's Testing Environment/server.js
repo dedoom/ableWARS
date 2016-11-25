@@ -614,17 +614,20 @@ app.post('/usernameValidation', function(req, res, next) {
                 response = "200";
                 console.log(response);
                 res.end(response);
+				dbConnV.close();
             } else {
                 response = "410";
                 console.log(response);
                 res.end(response);
+				dbConnV.close();
             }
         });
-        
-        console.log("dbv connection closed");
-        dbConnV.close();
     }).catch(function (err) {
         console.log(err);
+		response = "410";
+        console.log(response);
+        res.end(response);
+		dbConnV.close();
     });
 });
 
@@ -671,5 +674,61 @@ app.post('/getStats', function(req, res, next) {
 		console.log(response);
 		console.log(err);
         res.end(response);
+    });
+});
+
+app.post('updateStats', function(req, res, next) {
+    var uname = req.body.username;
+	var gamesPlayed = parseInt(req.body.gamesPlayed);
+	var wins = parseInt(req.body.wins);
+	var losses = parseInt(req.body.losses);
+	var fastestWin = parseInt(req.body.fastestWin);
+	var highScore = parseInt(req.body.highScore);
+	response = "";
+    
+    var dbConn = new sql.Connection(config);
+    
+    dbConn.connect().then(function(){
+        var transactionStats = new sql.Transaction(dbConn);
+        
+        transactionStats.begin().then(function() {
+            var request = new sql.Request(dbConn);
+            console.log("Transaction update Stats");
+            request.query("UPDATE Statistics SET gamesPlayed=" + gamesPlayed + ", wins=" + wins + ", losses=" + losses + ", fastestWin=" + fastestWin + ", highScore=" + highScore + " WHERE username='" + uname + "'");
+			.then(function() {
+				transactionStates.commit().then(function(recordset) {
+					response = "200";
+					console.log(response);
+					console.log("Affected Rows: " + request.rowsAffected);
+					dbConn.close();
+					res.end(response);
+				}).catch(function (err) {
+					response = "410";
+					console.log(response);
+					console.log("Error in Transaction Commit " + err);
+					dbConn.close();
+					res.end(response);
+				});
+				}).catch(function (err) {
+					response = "410";
+					console.log(response);
+					console.log("Error in Transaction Begin " + err);
+					dbConn.close();
+					res.end(response);
+				});
+		}
+		}).catch(function (err) {
+			response = "410";
+			console.log(response);
+			console.log(err);
+			dbConn.close();
+			res.end(response);
+		});
+    }).catch(function (err) {
+        response = "410";
+		console.log(response);
+		console.log(err);
+		bdConn.close();
+		res.end(response);
     });
 });

@@ -35,8 +35,12 @@
 			var endGameResult;
 			var waitingTagStrCount = 0;
 
+			
             $(document).ready(function () {
-                //create an onClick event for each <div> in the playing field to remove itself and increment player
+                if (!sessionStorage.userId)
+					socket.disconnect();
+                    window.location.assign("/index.html");
+				//create an onClick event for each <div> in the playing field to remove itself and increment player
 				sizeComponentsToBrowser();
 				lastPlayingFieldWidth = $('#playingField').width();
 				lastPlayingFieldHeight = $('#playingField').height();
@@ -56,6 +60,10 @@
 					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });*/
                 });
             });
+			
+			$(window).on('hashchange', function(e){
+				socket.disconnect();
+			});
 			
 			$(window).resize(function(){
 				sizeComponentsToBrowser();
@@ -360,6 +368,15 @@
 				clearInterval(interval2);
 				clearInterval(interval4);
 				$('#timer').text("GameOver!");
+				
+				/* ////////////////////////////////////////
+				///////////////////////////////////////////
+				///////////////////////////////////////////
+				////////////Bilal stats ecording///////////
+				///////////////////////////////////////////
+				///////////////////////////////////////////
+				/////////////////////////////////////////// */
+				
 				var shapeDivs = $('#playingField').children();
 				interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
 			}

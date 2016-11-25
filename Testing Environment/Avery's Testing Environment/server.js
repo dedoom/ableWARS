@@ -26,7 +26,7 @@ var config = {
         server: 'localhost',
         database: 'AbleWars',
         user: 'able',
-        password: 'password',
+        password: '5hXmvneh',
         port: 1433
     };
 

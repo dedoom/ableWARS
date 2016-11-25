@@ -11,12 +11,11 @@
 		var browserWidth, browserHeight;
 		
 		$(document).ready(function(){
-        
-        if (sessionStorage.userId) {
-            loggedIn();
-        } else {
-            loggedOut();
-        }
+			if (sessionStorage.userId) {
+				loggedIn();
+			} else {
+				loggedOut();
+			}
 			sizeComponentsToBrowser();
 		});
 		
@@ -48,7 +47,7 @@
 		}
         
         function loggedIn() {
-            $('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
+			$('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
             $('#stateLoggedOut').hide();
             $('#stateLoggedIn').show();
             

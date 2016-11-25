@@ -492,9 +492,9 @@ app.post('/signUp', function(req, res, next) {
     var response = "";
     
     var dbConn = new sql.Connection(config);
-    console.log("db connection openned");
 
     dbConn.connect().then(function() {
+		console.log("db connection openned");
         var transaction = new sql.Transaction(dbConn);
         transaction.begin().then(function() {
             var request = new sql.Request(dbConn);
@@ -503,26 +503,92 @@ app.post('/signUp', function(req, res, next) {
             .then(function() {
                 transaction.commit().then(function(recordset) {
                     console.log("Affected Rows: " + request.rowsAffected);
-                    dbConn.close();
+					dbConn.close();
+					response = "200";
+					console.log(response);
+					res.end(response);
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);
                     dbConn.close();
+					response = "410";
+					console.log(response);
+					res.end(response);
             });
         }).catch(function (err) {
                 console.log("Error in Transaction Begin " + err);
                 dbConn.close();
-            });
+				response = "410";
+				console.log(response);
+				res.end(response);
+            })
         }).catch(function (err) {
             console.log(err);
             dbConn.close();
+			response = "410";
+			console.log(response);
+			res.end(response);
         });
-
-        response = "200";
-        console.log(response);
-        res.end(response);
 
     }).catch(function (err) {
         console.log(err);
+		dbConn.close();
+		response = "410";
+		console.log(response);
+		res.end(response);
+    });
+});
+
+app.post('/createStatsRecord', function(req, res, next) {
+	var uname = req.body.username;
+    var response = "";
+    
+    var dbConn = new sql.Connection(config);
+	
+	dbConn.connect().then(function() {
+		console.log("db connection openned");
+        var transaction = new sql.Transaction(dbConn);
+        transaction.begin().then(function() {
+            var request = new sql.Request(dbConn);
+            console.log("Transaction");
+            request.query("INSERT INTO [dbo].[Statistics] (username,wins,losses,fastestWin,highestScore,gamesPlayed) VALUES ('" + uname + "','0','0','0','0','0')")
+            .then(function() {
+                transaction.commit().then(function(recordset) {
+                    console.log("Affected Rows: " + request.rowsAffected);
+                    dbConn.close();
+					response = "200";
+					console.log(response);
+					res.end(response);
+                }).catch(function (err) {
+                    console.log("Error in Transaction Commit " + err);
+                    dbConn.close();
+					dbConn.close();
+					response = "410";
+					console.log(response);
+					res.end(response);
+            });
+        }).catch(function (err) {
+                console.log("Error in Transaction Begin " + err);
+                dbConn.close();
+				dbConn.close();
+				response = "410";
+				console.log(response);
+				res.end(response);
+            })
+        }).catch(function (err) {
+            console.log(err);
+            dbConn.close();
+			dbConn.close();
+			response = "410";
+			console.log(response);
+			res.end(response);
+        });
+
+    }).catch(function (err) {
+        console.log(err);
+		dbConn.close();
+		response = "410";
+		console.log(response);
+		res.end(response);
     });
 });
 
@@ -545,11 +611,11 @@ app.post('/usernameValidation', function(req, res, next) {
         // verify username uniqueness
         requestV.query("SELECT * FROM account WHERE username='" + uname + "'").then(function (recordSetV) {
             if (recordSetV.length != 0) {
-                response = "410";
+                response = "200";
                 console.log(response);
                 res.end(response);
             } else {
-                response = "200";
+                response = "410";
                 console.log(response);
                 res.end(response);
             }
@@ -559,5 +625,51 @@ app.post('/usernameValidation', function(req, res, next) {
         dbConnV.close();
     }).catch(function (err) {
         console.log(err);
+    });
+});
+
+app.post('/getStats', function(req, res, next) {
+	if (req == null){
+		console.log("req null");
+	}
+	if (req.body == null){
+		console.log("req null");
+	}
+    var uname = req.body.username;
+	var response = "";
+    
+    var dbConnV = new sql.Connection(config);
+    
+    dbConnV.connect().then(function() {
+        console.log("dbv connection opened: retrieving stats");
+        
+        var requestV = new sql.Request(dbConnV);
+        requestV.query("SELECT * FROM [dbo].[Statistics] WHERE username='" + uname + "'").then(function (recordSetV) {
+            if (recordSetV.length != 0) {
+				dbConnV.close();
+				response = "200";
+				console.log(response);
+				console.log(recordSetV.length);
+                console.log("recordSetV" + recordSetV[0]['accountStatistics']);
+                res.end(JSON.stringify(recordSetV[0]));
+            } else {
+				dbConnV.close();
+                response = "410";
+                console.log(response);
+                res.end(response);
+            }
+        }).catch(function (err) {
+			dbConnV.close();
+			response = "410";
+			console.log(response);
+			console.log(err);
+			res.end(response);
+		})
+    }).catch(function (err) {
+		dbConnV.close();
+		response = "410";
+		console.log(response);
+		console.log(err);
+        res.end(response);
     });
 });

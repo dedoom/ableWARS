@@ -70,6 +70,20 @@
                 }
             });
         });
+		 $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtn.png");
+        }
+       
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtn.png");
+        }
+        
+    })
     </script>
     
     <div id="RegCenter">

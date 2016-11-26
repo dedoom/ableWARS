@@ -4,46 +4,84 @@
     <head>
         <title></title>
         <script src="javascript/jquery.js"></script> 
-        <script src="/socket.io/socket.io.js"></script>
         <!--<script src="javascript/gameplay.js"></script>-->
         <link rel="StyleSheet" href="css/styles.css" />
     </head>
     <body>
         <div id="SISOButtons">
-            <label id="welcomeMessage">Login to access the game! Don't have an account? Register Now!</label>
-            <div id="btnContainer">
-                <div class="accBtn" id="logInButton">Log In</div>
-                <div class="accBtn" id="registerButton">Register</div>
-            </div>
+        <label id="welcomeMessage">Login to access the game! Don't have an account? Register Now!</label>
+        <div class="btnContainer" id="stateLoggedOut">
+            <a href="login.html"><div class="accBtn" id="logInButton">Log In</div></a>
+            <a href="Registration.html"><div class="accBtn" id="registerButton">Register</div></a>
         </div>
+        <div class="btnContainer" id="stateLoggedIn">
+            <div class="accBtn" id="logoutButton" onclick="signOut()">Sign Out</div>
+        </div>
+    </div>
         <br /><br /><br /><br />
         <div id="able_wars_">How To Play</div>
         <br />
        
-        <div id="HowToPlayText">
-            <p>To play ABLE WARS you must follow the correct instructions.</p>
-            <p>You advance your teams position whenever a correct action is taken.</p>
-            <p>Put your enemies in the mud and prove your GREATNESS!</p>
-            <br />
+        <div id="HowToPlay">
+			<button class="instructionsNextBackBtn" id="instructionsBackBtn" onclick="instructionsBack()">Back</button>
+			<button class="instructionsNextBackBtn" id="instructionsNextBtn" onclick="instructionsNext()">Next</button>
+            <p class="instructionsText" id="instruction1">ABLE WARS is a team based competition game. You and your team must work together against the opposing team to help keep your champion out of the mud,
+				while trying to put your opponent's competitor in to it. Every point you score for you team brings you one step closer to victory, and your opponent on step closer
+				to the MUD!</p>
+			<p class="instructionsText" id="instruction2">When your game begins, several moving shapes will be placed in the playing field, Your first target shape will be displayed above the playing 
+				field, and the target shape will have a given number of lives shown beside it.</p>
+			<p class="instructionsText" id="instruction3">You must attempt to tap the target shape as many times as it has lives before a player on the opposing team does the same. If you succeed at this, 
+				you will score a point for your team and knock your opponent down a peg.</p>
+			<p class="instructionsText" id="instruction4">When one team has been pulled into the mud before the time runs out, the team not in the mud wins. If the timer runs out before one team has 
+				been pulled into the mud, the game will end, and the team with the highest score is the winner. Put your enemies in the mud and prove your GREATNESS!</p>
         </div>
 			
 		<div id="artboard_1">
-                 
-            <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png"/></div></a>
-            <a href="Index.html"><div class="mainBtn IndexBtn"><img id="go_to_menu" src="../img/mmBtn.png"/></div></a>
+            <a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png"/></a>
+            <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png"/></a>
         </div>
+		<br/>
+		<br/>
     </body>
 	
 	<script>
 		var browserWidth, browserHeight;
+		var instruction = 1;
 		
 		$(document).ready(function(){
+            if (sessionStorage.userId) {
+                loggedIn();
+            } else {
+                loggedOut();
+            }
+            
 			sizeComponentsToBrowser();
+			$('#instruction2').css('display', 'none');
+			$('#instruction3').css('display', 'none');
+			$('#instruction4').css('display', 'none');
 		});
 		
 		$(window).resize(function(){
 			sizeComponentsToBrowser();
 		});
+		
+		function instructionsBack(){
+			if (instruction == 1){
+				return;
+			}
+			$('#instruction' + instruction).css('display', 'none');
+			instruction--;
+			$('#instruction' + instruction).css('display', 'block');
+		}
+		
+		function instructionsNext(){
+			if (instruction == 4){
+				return;
+			}
+			$('#instruction' + instruction).css('display', 'none');
+			instruction++;
+			$('#instruction' + instruction).css('display', 'block');
+		}
 		
 		function sizeComponentsToBrowser() {
 		    browserWidth = $(window).width();
@@ -68,26 +106,46 @@
 		 	   
 		}
 		
-		 $(".mainBtn").mousedown(function () {
-       
+	$(".mainBtn").mousedown(function () {   
         if ($(this).hasClass("warBtn")) {
-            $(this).addClass("warClick");
-            GoToWar();
+            $(this).attr('src', "img/warBtnClick.png");
         }
         else if ($(this).hasClass("IndexBtn")) {
-            $(this).addClass("IndexClick");
-            GoToSettings();
+            $(this).attr('src', "img/mmBtnClick.png");
         }
     });
 	
     $(".mainBtn").mouseup(function () {
         if ($(this).hasClass("warBtn")) {
-            $(this).removeClass("warClick");
+            $(this).attr('src', "img/warBtn.png");
         }
         else if ($(this).hasClass("IndexBtn")) {
-            $(this).removeClass("IndexClick");
+            $(this).attr('src', "img/mmBtn.png");
         }       
-    })
+    });
+        
+    function loggedIn() {
+            $('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
+            $('#stateLoggedOut').hide();
+            $('#stateLoggedIn').show();
+            
+        }
+        function loggedOut() {
+            $('#welcomeMessage').text("Login to access the game! Don't have an account? Register Now!");
+            $('#stateLoggedOut').show();
+            $('#stateLoggedIn').hide();
+        }
+        function signOut() {
+            sessionStorage.clear();
+            window.location.assign("/instructions.html");
+        }
+        function validate() {
+            if(sessionStorage.userId) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 		
 	</script>
 </html>

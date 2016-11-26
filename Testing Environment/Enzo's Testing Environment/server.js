@@ -26,7 +26,7 @@ var config = {
         server: 'localhost',
         database: 'AbleWars',
         user: 'able',
-        password: 'password',
+        password: '5hXmvneh',
         port: 1433
     };
 
@@ -43,6 +43,7 @@ var player3ID;
 var shapesPerRequest = 5;
 
 app.use(express.static(path.join(__dirname + '/')));
+app.use(bodyParser.json({extend:true}))
 
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/index.html');
@@ -84,11 +85,11 @@ io.on('connection', function (socket) {
 			team1: {
 				player1: { playerID: player1ID, socket: player1Socket, targetTimestamp: 0 }, 
 				player2: { playerID: player3ID, socket: player3Socket, targetTimestamp: 0 },
-				score: -11},
+				score: -1000},
 			team2: {
 				player1: {playerID: player2ID, socket: player2Socket, targetTimestamp: 0 },
 				player2: {playerID: player4ID, socket: socket, targetTimestamp: 0 },
-				score: -11},
+				score: -1000},
 			gameOver: false};
 		matches.push(match);
         numOfMatches++;
@@ -101,10 +102,11 @@ io.on('connection', function (socket) {
 		player3Socket.emit('newTargetShapeLives', targetLives);
         socket.emit('newTargetShapeLives', targetLives);
 		
-        player1Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player1ID });
-		player2Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player2ID });
-		player3Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player3ID });
-		socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player4ID });
+		var startTime = Date.now() + 4000;
+        player1Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player1ID, startTime: startTime });
+		player2Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player2ID, startTime: startTime });
+		player3Socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player3ID, startTime: startTime });
+		socket.emit('startGame', { matchID: match['matchID'], shapes: shapes, playerID: player4ID, startTime: startTime });
 		
 		numOfClientsQueued = 0;
 		player1Socket = null;
@@ -257,7 +259,7 @@ io.on('connection', function (socket) {
 	socket.on('timeUp', function(data){
 		var matchIndex = getIndexOfMatchByID(data['matchID']);
 		var match = getMatchByID(data['matchID']);
-		console.log("player" + data['playerNum'] + "emit tie");
+		console.log("player " + data['playerNum'] + " emit tie");
 		if (match == null){
 			console.log("time up called on null match by player " + data['playerNum']);
 			return;
@@ -279,30 +281,31 @@ io.on('connection', function (socket) {
 				opponentTeam = 1;
 			}
 		matches[matchIndex]['team' + team]['score'] = score;
-		if (matches[matchIndex]['team1']['score'] > -11 && matches[matchIndex]['team2']['score'] > -11) {
+		if (matches[matchIndex]['team1']['score'] > -999 && matches[matchIndex]['team2']['score'] > -999) {
 			if (matches[matchIndex]['team1']['score'] > matches[matchIndex]['team2']['score']){
-				match['team' + opponentTeam]['player1']['socket'].emit('lose');
-				match['team' + opponentTeam]['player2']['socket'].emit('lose');
-				match['team' + team]['player1']['socket'].emit('win');
-				match['team' + team]['player2']['socket'].emit('win');
+				console.log("team1: " + matches[matchIndex]['team1']['score'] + ", team2: " + matches[matchIndex]['team2']['score']);
+				match['team2']['player1']['socket'].emit('lose');
+				match['team2']['player2']['socket'].emit('lose');
+				match['team1']['player1']['socket'].emit('win');
+				match['team1']['player2']['socket'].emit('win');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(256);
 			}
 			else if (matches[matchIndex]['team1']['score'] < matches[matchIndex]['team2']['score']){
-				match['team' + opponentTeam]['player1']['socket'].emit('win');
-				match['team' + opponentTeam]['player2']['socket'].emit('win');
-				match['team' + team]['player1']['socket'].emit('lose');
-				match['team' + team]['player2']['socket'].emit('lose');
+				match['team2']['player1']['socket'].emit('win');
+				match['team2']['player2']['socket'].emit('win');
+				match['team1']['player1']['socket'].emit('lose');
+				match['team1']['player2']['socket'].emit('lose');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(265);
 			}
 			else {
-				match['team' + opponentTeam]['player1']['socket'].emit('tie');
-				match['team' + opponentTeam]['player2']['socket'].emit('tie');
-				match['team' + team]['player1']['socket'].emit('tie');
-				match['team' + team]['player2']['socket'].emit('tie');
+				match['team1']['player1']['socket'].emit('tie');
+				match['team1']['player2']['socket'].emit('tie');
+				match['team2']['player1']['socket'].emit('tie');
+				match['team2']['player2']['socket'].emit('tie');
 				matches.splice(getIndexOfMatchByID(data['matchID']), 1);
 				numOfMatches--;
 				ensureSplice(274);
@@ -489,9 +492,9 @@ app.post('/signUp', function(req, res, next) {
     var response = "";
     
     var dbConn = new sql.Connection(config);
-    console.log("db connection openned");
 
     dbConn.connect().then(function() {
+		console.log("db connection openned");
         var transaction = new sql.Transaction(dbConn);
         transaction.begin().then(function() {
             var request = new sql.Request(dbConn);
@@ -500,30 +503,102 @@ app.post('/signUp', function(req, res, next) {
             .then(function() {
                 transaction.commit().then(function(recordset) {
                     console.log("Affected Rows: " + request.rowsAffected);
-                    dbConn.close();
+					dbConn.close();
+					response = "200";
+					console.log(response);
+					res.end(response);
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);
                     dbConn.close();
+					response = "410";
+					console.log(response);
+					res.end(response);
             });
         }).catch(function (err) {
                 console.log("Error in Transaction Begin " + err);
                 dbConn.close();
-            });
+				response = "410";
+				console.log(response);
+				res.end(response);
+            })
         }).catch(function (err) {
             console.log(err);
             dbConn.close();
+			response = "410";
+			console.log(response);
+			res.end(response);
         });
-
-        response = "200";
-        console.log(response);
-        res.end(response);
 
     }).catch(function (err) {
         console.log(err);
+		dbConn.close();
+		response = "410";
+		console.log(response);
+		res.end(response);
+    });
+});
+
+app.post('/createStatsRecord', function(req, res, next) {
+	var uname = req.body.username;
+    var response = "";
+    
+    var dbConn = new sql.Connection(config);
+	
+	dbConn.connect().then(function() {
+		console.log("db connection openned");
+        var transaction = new sql.Transaction(dbConn);
+        transaction.begin().then(function() {
+            var request = new sql.Request(dbConn);
+            console.log("Transaction");
+            request.query("INSERT INTO [dbo].[Statistics] (username,wins,losses,fastestWin,highestScore,gamesPlayed) VALUES ('" + uname + "','0','0','0','0','0')")
+            .then(function() {
+                transaction.commit().then(function(recordset) {
+                    console.log("Affected Rows: " + request.rowsAffected);
+                    dbConn.close();
+					response = "200";
+					console.log(response);
+					res.end(response);
+                }).catch(function (err) {
+                    console.log("Error in Transaction Commit " + err);
+                    dbConn.close();
+					dbConn.close();
+					response = "410";
+					console.log(response);
+					res.end(response);
+            });
+        }).catch(function (err) {
+                console.log("Error in Transaction Begin " + err);
+                dbConn.close();
+				dbConn.close();
+				response = "410";
+				console.log(response);
+				res.end(response);
+            })
+        }).catch(function (err) {
+            console.log(err);
+            dbConn.close();
+			dbConn.close();
+			response = "410";
+			console.log(response);
+			res.end(response);
+        });
+
+    }).catch(function (err) {
+        console.log(err);
+		dbConn.close();
+		response = "410";
+		console.log(response);
+		res.end(response);
     });
 });
 
 app.post('/usernameValidation', function(req, res, next) {
+	if (req == null){
+		console.log("req null");
+	}
+	if (req.body == null){
+		console.log("req null");
+	}
     var uname = req.body.username;
     var response = "";
     
@@ -536,19 +611,124 @@ app.post('/usernameValidation', function(req, res, next) {
         // verify username uniqueness
         requestV.query("SELECT * FROM account WHERE username='" + uname + "'").then(function (recordSetV) {
             if (recordSetV.length != 0) {
-                response = "410";
-                console.log(response);
-                res.end(response);
-            } else {
                 response = "200";
                 console.log(response);
                 res.end(response);
+				dbConnV.close();
+            } else {
+                response = "410";
+                console.log(response);
+                res.end(response);
+				dbConnV.close();
             }
         });
-        
-        console.log("dbv connection closed");
-        dbConnV.close();
     }).catch(function (err) {
         console.log(err);
+		response = "410";
+        console.log(response);
+        res.end(response);
+		dbConnV.close();
+    });
+});
+
+app.post('/getStats', function(req, res, next) {
+	if (req == null){
+		console.log("req null");
+	}
+	if (req.body == null){
+		console.log("req null");
+	}
+    var uname = req.body.username;
+	var response = "";
+    
+    var dbConnV = new sql.Connection(config);
+    
+    dbConnV.connect().then(function() {
+        console.log("dbv connection opened: retrieving stats");
+        
+        var requestV = new sql.Request(dbConnV);
+        requestV.query("SELECT * FROM [dbo].[Statistics] WHERE username='" + uname + "'").then(function (recordSetV) {
+            if (recordSetV.length != 0) {
+				dbConnV.close();
+				response = "200";
+				console.log(response);
+				console.log(recordSetV.length);
+                console.log("recordSetV" + recordSetV[0]['accountStatistics']);
+                res.end(JSON.stringify(recordSetV[0]));
+            } else {
+				dbConnV.close();
+                response = "410";
+                console.log(response);
+                res.end(response);
+            }
+        }).catch(function (err) {
+			dbConnV.close();
+			response = "410";
+			console.log(response);
+			console.log(err);
+			res.end(response);
+		})
+    }).catch(function (err) {
+		dbConnV.close();
+		response = "410";
+		console.log(response);
+		console.log(err);
+        res.end(response);
+    });
+});
+
+app.post('updateStats', function(req, res, next) {
+    var uname = req.body.username;
+	var gamesPlayed = parseInt(req.body.gamesPlayed);
+	var wins = parseInt(req.body.wins);
+	var losses = parseInt(req.body.losses);
+	var fastestWin = parseInt(req.body.fastestWin);
+	var highScore = parseInt(req.body.highScore);
+	response = "";
+    
+    var dbConn = new sql.Connection(config);
+    
+    dbConn.connect().then(function(){
+        var transactionStats = new sql.Transaction(dbConn);
+        
+        transactionStats.begin().then(function() {
+            var request = new sql.Request(dbConn);
+            console.log("Transaction update Stats");
+            request.query("UPDATE Statistics SET gamesPlayed=" + gamesPlayed + ", wins=" + wins + ", losses=" + losses + ", fastestWin=" + fastestWin + ", highScore=" + highScore + " WHERE username='" + uname + "'");
+			.then(function() {
+				transactionStates.commit().then(function(recordset) {
+					response = "200";
+					console.log(response);
+					console.log("Affected Rows: " + request.rowsAffected);
+					dbConn.close();
+					res.end(response);
+				}).catch(function (err) {
+					response = "410";
+					console.log(response);
+					console.log("Error in Transaction Commit " + err);
+					dbConn.close();
+					res.end(response);
+				});
+				}).catch(function (err) {
+					response = "410";
+					console.log(response);
+					console.log("Error in Transaction Begin " + err);
+					dbConn.close();
+					res.end(response);
+				});
+		}
+		}).catch(function (err) {
+			response = "410";
+			console.log(response);
+			console.log(err);
+			dbConn.close();
+			res.end(response);
+		});
+    }).catch(function (err) {
+        response = "410";
+		console.log(response);
+		console.log(err);
+		bdConn.close();
+		res.end(response);
     });
 });

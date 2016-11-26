@@ -5,27 +5,31 @@
     <title></title>
     <script src="javascript/jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <!--<script src="javascript/gameplay.js"></script>-->
     <link rel="StyleSheet" href="css/styles.css" />
 </head>
 <body>
     <div id="SISOButtons" class="SISOAlt">
-        <label id="welcomeMessage">Done for today?</label>
-        <div id="btnContainer">
-            <div class="accBtn" id="logoutButton">Sign Out</div>
+        <label id="welcomeMessage">Welcome </label>
+        <div class="btnContainer">
+            <div class="accBtn" id="logoutButton" onclick="signOut()">Sign Out</div>
         </div>
     </div>
     <br />
     <p id="pageHeader">Profile</p>
-    <div id="HowToPlayText">
-        <p>We should add some useful information to this page.</p>
-        <br />
+    <div id="profileInfo">
+        <p id="username">User: </p>
+		<p id="gamesPlayed">Number of games played: </p>
+		<p id="gamesWon">Number of games won: </p>
+		<p id="gamesLost">Number of games lost: </p>
+		<p id="winRatio">Win ratio: </p>
+		<p id="fastestTime">Fastest win time: </p>
+		<p id="highScore">Highest score: </p>
     </div>
 
     <div id="artboard_1">
 
-        <a href="play.html"><div class="mainBtn warBtn"><img id="go_to_war" src="../img/warBtn.png" /></div></a>
-        <a href="Index.html"><div class="mainBtn IndexBtn"><img id="go_to_menu" src="../img/mmBtn.png" /></div></a>
+        <a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png" /></a>
+        <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png" /></a>
     </div>
 </body>
 
@@ -33,8 +37,77 @@
 		var browserWidth, browserHeight;
 
 		$(document).ready(function(){
+            if (!sessionStorage.userId)
+                    window.location.assign("/index.html");
+            $('#welcomeMessage').append('' + sessionStorage.userId + '!');
+			
+			//retrieve stats
+			var stats = null;
+			console.log("step0");
+			validateAndGetStats();
+			
+			$('#username').append(sessionStorage.userId);
+            
 			sizeComponentsToBrowser();
 		});
+		
+		function getStats(){
+			console.log("step3");
+			var user = {
+                username : sessionStorage.userId
+            };
+            var jsonUser = JSON.stringify(user);
+            $.ajax({
+                url : '/getStats',
+				type : 'POST',
+				data : jsonUser,
+				contentType : 'application/json',
+				dataType : 'json',
+				success : function(result) {
+					console.log(result['gamesPlayed']);
+					$('#gamesPlayed').append(result['gamesPlayed']);
+					$('#gamesWon').append(result['wins']);
+					$('#gamesLost').append(result['losses']);
+					var winRatio = 0;
+					if (parseInt(result['gamesPlayed']) > 0){
+						winRatio = (100.0 / parseInt(result['gamesPlayed'])) * parseInt(result['wins']);
+					}
+					$('#winRatio').append(winRatio + '%');
+					$('#fastestTime').append(result['fastestWin']);
+					$('#highScore').append(result['highestScore']);
+				},
+				error : function(jqXHR, textStatus, err) {
+					alert('text status '+textStatus+', err '+err);
+				}
+			});
+		}
+		
+		function validateAndGetStats(){
+			console.log("step1");
+			var userValidate = {
+                username : sessionStorage.userId
+            };
+            var jsonValidate = JSON.stringify(userValidate);
+            $.ajax({
+                url : '/usernameValidation',
+				type : 'POST',
+				data : jsonValidate,
+				contentType : 'application/json',
+				dataType : 'json',
+				success : function(result) {
+					if (result == "200") {
+						console.log("step2");
+						return getStats();
+					} else {
+						alert("User could not be found.");
+						window.location.assign("/index.html");
+					}
+				},
+				error : function(jqXHR, textStatus, err) {
+					alert('text status '+textStatus+', err '+err);
+				}
+			});
+		}
 
 		$(window).resize(function(){
 			sizeComponentsToBrowser();
@@ -63,27 +136,28 @@
 
 		}
 
-		 $(".mainBtn").mousedown(function () {
-
+	$(".mainBtn").mousedown(function () {   
         if ($(this).hasClass("warBtn")) {
-            $(this).addClass("warClick");
-            GoToWar();
+            $(this).attr('src', "img/warBtnClick.png");
         }
         else if ($(this).hasClass("IndexBtn")) {
-            $(this).addClass("IndexClick");
-            GoToSettings();
+            $(this).attr('src', "img/mmBtnClick.png");
         }
     });
-
+	
     $(".mainBtn").mouseup(function () {
         if ($(this).hasClass("warBtn")) {
-            $(this).removeClass("warClick");
+            $(this).attr('src', "img/warBtn.png");
         }
         else if ($(this).hasClass("IndexBtn")) {
-            $(this).removeClass("IndexClick");
-        }
+            $(this).attr('src', "img/mmBtn.png");
+        }       
     })
 
+    function signOut() {
+            sessionStorage.clear();
+            window.location.assign("/index.html");
+        }
 </script>
 </html>
 

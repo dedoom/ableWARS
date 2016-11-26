@@ -128,20 +128,7 @@
                 }
             });
 		}
-         $(".mainBtn").mousedown(function () {
-       
-        if ($(this).hasClass("IndexBtn")) {
-            $(this).attr('src', "img/mmBtnClick.png");
-        }
-       
-    });
-	
-    $(".mainBtn").mouseup(function () {
-        if ($(this).hasClass("IndexBtn")) {
-            $(this).attr('src', "img/mmBtn.png");
-        }
-        
-    })
+     
     </script>
     
     <div id="RegCenter">
@@ -213,3 +200,20 @@
         </div>
     
     </body>
+	</html>
+	<script>
+	 $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtnClick.png");
+        }
+       
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtn.png");
+        }
+        
+    })
+</script>

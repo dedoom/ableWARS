@@ -124,7 +124,6 @@ html{
 
 #SISOButtons{
     background-color: grey;
-    width: 510px;
     border-radius: 5px;
     opacity: .7;
     position: relative;
@@ -375,15 +374,9 @@ html{
     color: #CC0000;
     font-weight: bold;
 }
-#RegCenter {
-    position: relative;
-    margin: 0 auto;
-    max-width: 420px;
-    min-width: 420px;
-    background-color: #CFDBC5;
-    padding: 3px 20px 10px 20px;
-    border-radius: 10px;
-    border: 10px solid #151515;
-    top: 50px;
-    
+
+#profileInfo{
+	font-size: 200%;
+	text-align: center;
+	margin: auto;
 }

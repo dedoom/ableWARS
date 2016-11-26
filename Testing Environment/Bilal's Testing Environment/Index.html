@@ -11,12 +11,11 @@
 		var browserWidth, browserHeight;
 		
 		$(document).ready(function(){
-        
-        if (sessionStorage.userId) {
-            loggedIn();
-        } else {
-            loggedOut();
-        }
+			if (sessionStorage.userId) {
+				loggedIn();
+			} else {
+				loggedOut();
+			}
 			sizeComponentsToBrowser();
 		});
 		
@@ -48,7 +47,7 @@
 		}
         
         function loggedIn() {
-            $('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
+			$('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
             $('#stateLoggedOut').hide();
             $('#stateLoggedIn').show();
             
@@ -131,16 +130,21 @@
     });*/
 	
     $(".mainBtn").mousedown(function () {
-       
-        if ($(this).hasClass("warBtn")) {
-            $(this).attr('src', "img/warBtnClick.png");
-        }
-        else if ($(this).hasClass("profileBtn")) {
-            $(this).attr('src', "img/profileBtnClick.png");
-        }
-        else if ($(this).hasClass("instructionsBtn")) {
-            $(this).attr('src', "img/instructionsBtnClick.png");
-        }
+       if(sessionStorage.userId) {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtnClick.png");
+            }
+            else if ($(this).hasClass("profileBtn")) {
+                $(this).attr('src', "img/profileBtnClick.png");
+            }
+            else if ($(this).hasClass("instructionsBtn")) {
+                $(this).attr('src', "img/instructionsBtnClick.png");
+            }
+       } else {
+           if ($(this).hasClass("instructionsBtn")) {
+                $(this).attr('src', "img/instructionsBtnClick.png");
+            }
+       }
     });
 	
     $(".mainBtn").mouseup(function () {

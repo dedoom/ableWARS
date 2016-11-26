@@ -211,6 +211,7 @@ html{
 	margin: auto;
     font-size: 20pt !important;
     font-weight: bold !important;
+	text-align: justify !important;
 }
 
 .mudInMiddle{

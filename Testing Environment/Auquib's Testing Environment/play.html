@@ -8,7 +8,7 @@
         <!--<script src="javascript/gameplay.js"></script>-->
 
         <script>
-            var homePageURL = "http://localhost:4000";
+            var homePageURL = "/";
 			var ipAddress;
             var socket = io.connect(homePageURL);
             var points = 0;
@@ -35,8 +35,12 @@
 			var endGameResult;
 			var waitingTagStrCount = 0;
 
+			
             $(document).ready(function () {
-                //create an onClick event for each <div> in the playing field to remove itself and increment player
+                if (!sessionStorage.userId)
+					socket.disconnect();
+                    window.location.assign("/index.html");
+				//create an onClick event for each <div> in the playing field to remove itself and increment player
 				sizeComponentsToBrowser();
 				lastPlayingFieldWidth = $('#playingField').width();
 				lastPlayingFieldHeight = $('#playingField').height();
@@ -56,6 +60,10 @@
 					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });*/
                 });
             });
+			
+			$(window).on('hashchange', function(e){
+				socket.disconnect();
+			});
 			
 			$(window).resize(function(){
 				sizeComponentsToBrowser();
@@ -360,8 +368,99 @@
 				clearInterval(interval2);
 				clearInterval(interval4);
 				$('#timer').text("GameOver!");
+				
+				recordStats();
+				
 				var shapeDivs = $('#playingField').children();
 				interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
+			}
+			
+			function getStats(){
+				console.log("step3");
+				var user = {
+					username : sessionStorage.userId
+				};
+				var jsonUser = JSON.stringify(user);
+				$.ajax({
+					url : '/getStats',
+					type : 'POST',
+					data : jsonUser,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(result) {
+						console.log(result['gamesPlayed']);
+						var newStats = {
+							username : sessionStorage.userId
+							gamesPlayed: parseInt(result['gamesPlayed']),
+							wins: parseInt(result['wins']),
+							losses: parseInt(result['losses']),
+							fastestWin: parseInt(result['fastestWin']),
+							highScore: parseInt(result['highestScore'])
+						};
+						newStats['gamesPlayed'] = newStats['gamesPlayed'] + 1;
+						if (endGameResult == "win" || endGameResult == "winDisconnect"){
+							newStats['wins'] = newStats['wins'] + 1;
+						}
+						else if (endGameResult == "lose" || endGameResult == "loseDisconnect") {
+							newStats['losses'] = newStats['losses'] + 1;
+						}
+						if (60 - timeRemaining < newStats['fastestWin']){
+							newStats['fastestWin'] = 60 - timeRemaining;
+						}
+						if (points > newStats['highScore']){
+							newStats['highScore'] = points;
+						}
+						updateStats(JSON.stringify(newStats));
+					},
+					error : function(jqXHR, textStatus, err) {
+						alert('text status '+textStatus+', err '+err);
+					}
+				});
+			}
+			
+			function updateStats(newStats){
+				var jsonStats = JSON.stringify(newStats);
+				
+				$.ajax({
+					url : '/updateStats',
+					type : 'POST',
+					data : jsonStats,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(result) {
+						console.log("Successfully updated stats");
+					},
+					error : function(jqXHR, textStatus, err) {
+						alert('text status '+textStatus+', err '+err);
+					}
+				});
+			}
+			
+			function recordStats(){
+				console.log("step1");
+				var userValidate = {
+					username : sessionStorage.userId
+				};
+				var jsonValidate = JSON.stringify(userValidate);
+				$.ajax({
+					url : '/usernameValidation',
+					type : 'POST',
+					data : jsonValidate,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(result) {
+						if (result == "200") {
+							console.log("step2");
+							return getStats();
+						} else {
+							alert("User could not be found.");
+							window.location.assign("/index.html");
+						}
+					},
+					error : function(jqXHR, textStatus, err) {
+						alert('text status '+textStatus+', err '+err);
+					}
+				});
 			}
 			
 			function fadeOutShape(shape){

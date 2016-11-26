@@ -19,6 +19,9 @@
     <script>
         $(document).ready(function() {
             
+            if (sessionStorage.userId)
+                window.location.assign("/index.html");
+            
             $("#form1").submit( function(e) {
                 e.preventDefault();
                 
@@ -47,14 +50,15 @@
 					//			change localhost to IP
 					//--------------------------------------------------------------------------
 					//--------------------------------------------------------------------------
-                        url : 'http://localhost:4000/signIn',
+                        url : '/signIn',
                         type : 'POST',
                         data : jsonCredentials,
                         contentType : 'application/json',
                         dataType : 'json',
                         success : function(result) {
                             if (result == "200") {
-                                window.location.assign("/MainMenu.html");
+                                sessionStorage.userId = user;
+                                window.location.assign("/index.html");
                             } else if (result == "400") {
                                 $("#errorPass").text("Invalid credentials!");
                             }
@@ -68,7 +72,7 @@
         });
     </script>
     
-    <div id="center">
+    <div id="RegCenter">
         <br />
     <h2>Login Page</h2>
     <h4>Please enter your credentials</h4>

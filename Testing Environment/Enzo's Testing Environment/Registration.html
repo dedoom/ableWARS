@@ -128,7 +128,7 @@
                 }
             });
 		}
-        
+     
     </script>
     
     <div id="RegCenter">
@@ -194,5 +194,26 @@
         </form>
         
     </div>
+	 <!--/*Adding new go to "Main Menu" button on Registration page"*/-->
+	<div id="artboard_2">
+            <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png"/></a>
+        </div>
     
     </body>
+	</html>
+	<script>
+	 $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtnClick.png");
+        }
+       
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtn.png");
+        }
+        
+    })
+</script>

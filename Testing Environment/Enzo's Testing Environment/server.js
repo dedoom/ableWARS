@@ -694,7 +694,7 @@ app.post('updateStats', function(req, res, next) {
         transactionStats.begin().then(function() {
             var request = new sql.Request(dbConn);
             console.log("Transaction update Stats");
-            request.query("UPDATE Statistics SET gamesPlayed=" + gamesPlayed + ", wins=" + wins + ", losses=" + losses + ", fastestWin=" + fastestWin + ", highScore=" + highScore + " WHERE username='" + uname + "'");
+            request.query("UPDATE Statistics SET gamesPlayed=" + gamesPlayed + ", wins=" + wins + ", losses=" + losses + ", fastestWin=" + fastestWin + ", highScore=" + highScore + " WHERE username='" + uname + "'")
 			.then(function() {
 				transactionStates.commit().then(function(recordset) {
 					response = "200";
@@ -716,7 +716,7 @@ app.post('updateStats', function(req, res, next) {
 					dbConn.close();
 					res.end(response);
 				});
-		}
+		
 		}).catch(function (err) {
 			response = "410";
 			console.log(response);

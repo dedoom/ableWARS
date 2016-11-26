@@ -37,9 +37,10 @@
 
 			
             $(document).ready(function () {
-                if (!sessionStorage.userId)
+                if (!sessionStorage.userId){
 					socket.disconnect();
                     window.location.assign("/index.html");
+				}
 				//create an onClick event for each <div> in the playing field to remove itself and increment player
 				sizeComponentsToBrowser();
 				lastPlayingFieldWidth = $('#playingField').width();
@@ -390,12 +391,12 @@
 					success : function(result) {
 						console.log(result['gamesPlayed']);
 						var newStats = {
-							username : sessionStorage.userId
-							gamesPlayed: parseInt(result['gamesPlayed']),
-							wins: parseInt(result['wins']),
-							losses: parseInt(result['losses']),
-							fastestWin: parseInt(result['fastestWin']),
-							highScore: parseInt(result['highestScore'])
+							username : sessionStorage.userId,
+							gamesPlayed : parseInt(result['gamesPlayed']),
+							wins : parseInt(result['wins']),
+							losses : parseInt(result['losses']),
+							fastestWin : parseInt(result['fastestWin']),
+							highScore : parseInt(result['highestScore'])
 						};
 						newStats['gamesPlayed'] = newStats['gamesPlayed'] + 1;
 						if (endGameResult == "win" || endGameResult == "winDisconnect"){
@@ -404,13 +405,14 @@
 						else if (endGameResult == "lose" || endGameResult == "loseDisconnect") {
 							newStats['losses'] = newStats['losses'] + 1;
 						}
-						if (60 - timeRemaining < newStats['fastestWin']){
+						if (60 - timeRemaining < newStats['fastestWin'] || newStats['fastestWin'] == 0){
 							newStats['fastestWin'] = 60 - timeRemaining;
 						}
 						if (points > newStats['highScore']){
 							newStats['highScore'] = points;
 						}
-						updateStats(JSON.stringify(newStats));
+						//console.log(newStats['username'] + " : " + newStats['gamesPlayed'] + " : " + newStats['wins'] + " : " + newStats['losses'] + " : " + newStats['fastestWin'] + " : " + newStats['highScore']);
+						updateStats(newStats);
 					},
 					error : function(jqXHR, textStatus, err) {
 						alert('text status '+textStatus+', err '+err);

@@ -49,8 +49,9 @@ app.get('/', function (req, res) {
     res.sendfile(__dirname + '/index.html');
 });
 
-server.listen(4000, function () {
-    console.log("listening on port 4000");
+var port = process.env.PORT || 8080;
+server.listen(port, function () {
+    console.log("listening on port " + port);
 });
 
 io.on('connection', function (socket) {
@@ -499,7 +500,7 @@ app.post('/signUp', function(req, res, next) {
         transaction.begin().then(function() {
             var request = new sql.Request(dbConn);
             console.log("Transaction");
-            request.query("INSERT INTO account (username,fName,lName,password,teamid) VALUES ('" + uname + "','" + fname + "','" + lname + "','" + pass + "'," + teamid + ")")
+            request.query("INSERT INTO [dbo].[account] (username,fName,lName,password,teamid) VALUES ('" + uname + "','" + fname + "','" + lname + "','" + pass + "'," + teamid + ")")
             .then(function() {
                 transaction.commit().then(function(recordset) {
                     console.log("Affected Rows: " + request.rowsAffected);
@@ -565,15 +566,15 @@ app.post('/createStatsRecord', function(req, res, next) {
 					response = "410";
 					console.log(response);
 					res.end(response);
-            });
-        }).catch(function (err) {
+				});
+			}).catch(function (err) {
                 console.log("Error in Transaction Begin " + err);
                 dbConn.close();
 				dbConn.close();
 				response = "410";
 				console.log(response);
 				res.end(response);
-            })
+            });
         }).catch(function (err) {
             console.log(err);
             dbConn.close();
@@ -582,7 +583,6 @@ app.post('/createStatsRecord', function(req, res, next) {
 			console.log(response);
 			res.end(response);
         });
-
     }).catch(function (err) {
         console.log(err);
 		dbConn.close();
@@ -609,7 +609,7 @@ app.post('/usernameValidation', function(req, res, next) {
         
         var requestV = new sql.Request(dbConnV);
         // verify username uniqueness
-        requestV.query("SELECT * FROM account WHERE username='" + uname + "'").then(function (recordSetV) {
+        requestV.query("SELECT * FROM [dbo].[account] WHERE username='" + uname + "'").then(function (recordSetV) {
             if (recordSetV.length != 0) {
                 response = "200";
                 console.log(response);
@@ -677,14 +677,16 @@ app.post('/getStats', function(req, res, next) {
     });
 });
 
-app.post('updateStats', function(req, res, next) {
-    var uname = req.body.username;
+app.post('/updateStats', function(req, res, next) {
+    console.log(req.body.uname + " : " + req.body.gamesPlayed + " : " + req.body.wins + " : " + req.body.losses + " : " + req.body.fastestWin + " : " + req.body.highScore);
+	var uname = req.body.username;
 	var gamesPlayed = parseInt(req.body.gamesPlayed);
 	var wins = parseInt(req.body.wins);
 	var losses = parseInt(req.body.losses);
 	var fastestWin = parseInt(req.body.fastestWin);
 	var highScore = parseInt(req.body.highScore);
 	response = "";
+	//console.log(uname + " : " + gamesPlayed + " : " + wins + " : " + losses + " : " + fastestWin + " : " + highScore);
     
     var dbConn = new sql.Connection(config);
     
@@ -694,9 +696,9 @@ app.post('updateStats', function(req, res, next) {
         transactionStats.begin().then(function() {
             var request = new sql.Request(dbConn);
             console.log("Transaction update Stats");
-            request.query("UPDATE Statistics SET gamesPlayed=" + gamesPlayed + ", wins=" + wins + ", losses=" + losses + ", fastestWin=" + fastestWin + ", highScore=" + highScore + " WHERE username='" + uname + "'");
+            request.query("UPDATE [dbo].[Statistics] SET gamesPlayed=" + gamesPlayed + ", wins=" + wins + ", losses=" + losses + ", fastestWin=" + fastestWin + ", highestScore=" + highScore + " WHERE username='" + uname + "'")
 			.then(function() {
-				transactionStates.commit().then(function(recordset) {
+				transactionStats.commit().then(function(recordset) {
 					response = "200";
 					console.log(response);
 					console.log("Affected Rows: " + request.rowsAffected);
@@ -716,7 +718,6 @@ app.post('updateStats', function(req, res, next) {
 					dbConn.close();
 					res.end(response);
 				});
-		}
 		}).catch(function (err) {
 			response = "410";
 			console.log(response);

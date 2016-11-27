@@ -403,6 +403,14 @@ html{
     padding: 25px 0px 25px 0px;
     border-radius: 10px;
 }
+.instructionBox{
+    position: relative;
+    margin: 0 auto;
+    background-color: #a5c5a5;
+    box-shadow: 10px 10px 5px #314731;
+    padding: 25px 10px 25px 10px;
+    border-radius: 10px;
+}
 #artboard_2 img {
     position: relative;
     margin: 0 auto;

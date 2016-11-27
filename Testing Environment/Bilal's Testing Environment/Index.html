@@ -46,16 +46,20 @@
 			$('#instructions').css('margin-top', parseFloat($('#instructions').css('height')) * 0.5);
 		}
         
+        // BILAL's BUTTON Edit: onclick -->
         function loggedIn() {
 			$('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
             $('#stateLoggedOut').hide();
             $('#stateLoggedIn').show();
-            
+            $('#go_to_war').attr('src', 'img/warBtn.png');
+            $('#profile').attr('src', 'img/profileBtn.png');
         }
         function loggedOut() {
             $('#welcomeMessage').text("Login to access the game! Don't have an account? Register Now!");
             $('#stateLoggedOut').show();
             $('#stateLoggedIn').hide();
+            $('#go_to_war').attr('src', 'img/warBtnGrey.png');
+            $('#profile').attr('src', 'img/profileBtnGrey.png');
         }
         function signOut() {
             sessionStorage.clear();
@@ -68,7 +72,7 @@
                 return false;
             }
         }
-        
+        // BILAL's BUTTON Edit ends
         
 	</script>
     <!-- Add your custom HEAD content here -->
@@ -94,9 +98,11 @@
             <div class="txtBtn profileBtn" id="profile">
                 Profile
             </div>-->
-			<a href="play.html" onclick="return validate();"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png"/></a>
-            <a href="Profile.html" onclick="return validate();"><img class="mainBtn profileBtn" id="profile" src="img/profileBtn.png"/></a>
+            <!-- BILAL's BUTTON Edit: onclick -->
+			<a href="play.html" onclick="return validate();"><img class="mainBtn warBtn" id="go_to_war"/></a>
+            <a href="Profile.html" onclick="return validate();"><img class="mainBtn profileBtn" id="profile"/></a>
             <a href="Instructions.html"><img class="mainBtn instructionsBtn" id="instructions" src="img/instructionsBtn.png"/></a>
+            <!-- BILAL's BUTTON Edit ends -->
         </div>
     </div>
 	
@@ -129,6 +135,7 @@
         }
     });*/
 	
+    // BILAL's BUTTON Edit: onclick -->
     $(".mainBtn").mousedown(function () {
        if(sessionStorage.userId) {
             if ($(this).hasClass("warBtn")) {
@@ -141,21 +148,41 @@
                 $(this).attr('src', "img/instructionsBtnClick.png");
             }
        } else {
-           if ($(this).hasClass("instructionsBtn")) {
+           if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtnClickGrey.png");
+            }
+            else if ($(this).hasClass("profileBtn")) {
+                $(this).attr('src', "img/profileBtnClickGrey.png");
+            }
+            else if ($(this).hasClass("instructionsBtn")) {
                 $(this).attr('src', "img/instructionsBtnClick.png");
             }
        }
     });
 	
     $(".mainBtn").mouseup(function () {
-        if ($(this).hasClass("warBtn")) {
-            $(this).attr('src', "img/warBtn.png");
+        if (sessionStorage.userId) {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtn.png");
+            }
+            else if ($(this).hasClass("profileBtn")) {
+                $(this).attr('src', "img/profileBtn.png");
+            }
+            else if ($(this).hasClass("instructionsBtn")) {
+                $(this).attr('src', "img/instructionsBtn.png");
+            }
+        } else {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtnGrey.png");
+            }
+            else if ($(this).hasClass("profileBtn")) {
+                $(this).attr('src', "img/profileBtnGrey.png");
+            }
+            else if ($(this).hasClass("instructionsBtn")) {
+                $(this).attr('src', "img/instructionsBtn.png");
+            }
         }
-        else if ($(this).hasClass("profileBtn")) {
-            $(this).attr('src', "img/profileBtn.png");
-        }
-        else if ($(this).hasClass("instructionsBtn")) {
-            $(this).attr('src', "img/instructionsBtn.png");
-        }
+        
     })
+    // BILAL's BUTTON Edit ends
 </script>

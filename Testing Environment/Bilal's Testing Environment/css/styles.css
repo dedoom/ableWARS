@@ -202,6 +202,7 @@ html{
 	margin: auto;
     font-size: 20pt !important;
     font-weight: bold !important;
+	text-align: justify !important;
 }
 
 .mudInMiddle{
@@ -380,3 +381,30 @@ html{
 	text-align: center;
 	margin: auto;
 }
+
+/*
+    BILAL's CSS EDIT
+*/
+.boxContainer {
+    position: relative;
+    margin: 0 auto;
+    max-width: 500px;
+    min-width: 500px;
+    border: none;
+    top: 50px;
+}
+.infoBox {
+    position: relative;
+    margin: 0 auto;
+    max-width: 500px;
+    min-width: 500px;
+    background-color: #a5c5a5;
+    box-shadow: 10px 10px 5px #314731;
+    padding: 25px 0px 25px 0px;
+    border-radius: 10px;
+}
+#artboard_2 img {
+    position: relative;
+    margin: 0 auto;
+}
+/* BILAL's EDIT ENDS */

@@ -128,71 +128,95 @@
                 }
             });
 		}
-        
+     
     </script>
-    
-    <div id="RegCenter">
-    
-        <h2>Registration Page</h2>
-        <p><i>Each field is mandatory.</i> </p>
-        <form id="SignUpForm">
-            <table border="0" align="center">
-<!--
-                <tr>
-                    <td>First Name :<br />&nbsp;</td>
-                    <td>
-                        <Input ID="txtFName" name="txtFName"></Input>
-                        <br />&nbsp;
-                        <Label class="lbl" ID="errFN"></Label>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Last Name :<br />&nbsp;</td>
-                    <td>
-                        <Input ID="txtLName" name="txtLName"></Input>
-                        <br />&nbsp;
-                        <Label class="lbl" ID="errLN"></Label>
-                    </td>
-                </tr>
--->
-                <tr>
-                    <td>Username :<br />&nbsp;</td>
-                    <td>
-                        <Input ID="txtUName" name="txtUName"></Input>
-                        <br />&nbsp;
-                        <Label class="lbl" ID="errUN"></Label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="auto-style1">Password :<br />&nbsp;</td>
-                    <td class="auto-style1">
+    <!-- BILAL's Box Container Edit: <div class="boxContainer">  and replace class="RegCenter" to "infoBox"-->
+    <div class="boxContainer">
+        <div class="infoBox">
 
-                        <Input ID="txtPassReg" name="txtPassReg" Width="180px" type="Password"></Input>
-                        <br />&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td class="auto-style1">Re-Type Password :<br />&nbsp;</td>
-                    <td class="auto-style1">
+            <h2>Registration Page</h2>
+            <p><i>Each field is mandatory.</i> </p>
+            <form id="SignUpForm">
+                <table border="0" align="center">
+    <!--
+                    <tr>
+                        <td>First Name :<br />&nbsp;</td>
+                        <td>
+                            <Input ID="txtFName" name="txtFName"></Input>
+                            <br />&nbsp;
+                            <Label class="lbl" ID="errFN"></Label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Last Name :<br />&nbsp;</td>
+                        <td>
+                            <Input ID="txtLName" name="txtLName"></Input>
+                            <br />&nbsp;
+                            <Label class="lbl" ID="errLN"></Label>
+                        </td>
+                    </tr>
+    -->
+                    <tr>
+                        <td>Username :<br />&nbsp;</td>
+                        <td>
+                            <Input ID="txtUName" name="txtUName"></Input>
+                            <br />&nbsp;
+                            <Label class="lbl" ID="errUN"></Label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="auto-style1">Password :<br />&nbsp;</td>
+                        <td class="auto-style1">
 
-                        <Input ID="txtRePassReg" name="txtRePassReg" Width="180px" type="Password"></Input>
+                            <Input ID="txtPassReg" name="txtPassReg" Width="180px" type="Password"></Input>
+                            <br />&nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="auto-style1">Re-Type Password :<br />&nbsp;</td>
+                        <td class="auto-style1">
 
-                        <br />&nbsp;
+                            <Input ID="txtRePassReg" name="txtRePassReg" Width="180px" type="Password"></Input>
 
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">&nbsp;
-                        <Label class="lbl" ID="errPassReg"></Label></td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align: right">
-                        <Input type="submit" value="Register" style="margin-left: 0px"></Input>
-                    </td>
-                </tr>
-            </table>
-        </form>
-        
-    </div>
-    
+                            <br />&nbsp;
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&nbsp;
+                            <Label class="lbl" ID="errPassReg"></Label></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: right">
+                            <Input type="submit" value="Register" style="margin-left: 0px"></Input>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+
+            </div>
+        </div>
+    <!-- BILAL's Box Container Edit: Adding new go to "Main Menu" button on Login page"*/-->
+        <br/><br/><br/><br/><br/><br/>
+        <div id="artboard_2">
+                <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png"/></a>
+            </div>
+    <!-- BILAL's Box Container Edit ENDS -->
     </body>
+	</html>
+	<script>
+	 $(".mainBtn").mousedown(function () {
+       
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtnClick.png");
+        }
+       
+    });
+	
+    $(".mainBtn").mouseup(function () {
+        if ($(this).hasClass("IndexBtn")) {
+            $(this).attr('src', "img/mmBtn.png");
+        }
+        
+    })
+</script>

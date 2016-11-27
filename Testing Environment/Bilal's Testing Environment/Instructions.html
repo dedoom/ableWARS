@@ -21,10 +21,8 @@
         <br /><br /><br /><br />
         <div id="able_wars_">How To Play</div>
         <br />
-       
-        <div id="HowToPlay">
-			<button class="instructionsNextBackBtn" id="instructionsBackBtn" onclick="instructionsBack()">Back</button>
-			<button class="instructionsNextBackBtn" id="instructionsNextBtn" onclick="instructionsNext()">Next</button>
+        <!-- BILAL's BUTTON Edit: onclick -->
+        <div id="HowToPlay" class="infoBox">
             <p class="instructionsText" id="instruction1">ABLE WARS is a team based competition game. You and your team must work together against the opposing team to help keep your champion out of the mud,
 				while trying to put your opponent's competitor in to it. Every point you score for you team brings you one step closer to victory, and your opponent on step closer
 				to the MUD!</p>
@@ -34,16 +32,19 @@
 				you will score a point for your team and knock your opponent down a peg.</p>
 			<p class="instructionsText" id="instruction4">When one team has been pulled into the mud before the time runs out, the team not in the mud wins. If the timer runs out before one team has 
 				been pulled into the mud, the game will end, and the team with the highest score is the winner. Put your enemies in the mud and prove your GREATNESS!</p>
+            <button class="instructionsNextBackBtn" id="instructionsBackBtn" onclick="instructionsBack()">Back</button>
+			<button class="instructionsNextBackBtn" id="instructionsNextBtn" onclick="instructionsNext()">Next</button>
         </div>
-			
+			<br /><br />
 		<div id="artboard_1">
-            <a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png"/></a>
+            <a href="play.html" onclick="return validate();"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png"/></a>
             <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png"/></a>
         </div>
-		<br/>
-		<br/>
+        
+		<br/><br/>
+        
     </body>
-	
+	     <!-- BILAL's BUTTON Edit ENDS -->
 	<script>
 		var browserWidth, browserHeight;
 		var instruction = 1;
@@ -106,34 +107,55 @@
 		 	   
 		}
 		
-	$(".mainBtn").mousedown(function () {   
-        if ($(this).hasClass("warBtn")) {
-            $(this).attr('src', "img/warBtnClick.png");
-        }
-        else if ($(this).hasClass("IndexBtn")) {
-            $(this).attr('src', "img/mmBtnClick.png");
+    // BILAL's BUTTON Edit: onclick -->
+	$(".mainBtn").mousedown(function () {
+        if (sessionStorage.userId) {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtnClick.png");
+            }
+            else if ($(this).hasClass("IndexBtn")) {
+                $(this).attr('src', "img/mmBtnClick.png");
+            }
+        } else {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtnClickGrey.png");
+            }
+            else if ($(this).hasClass("IndexBtn")) {
+                $(this).attr('src', "img/mmBtnClick.png");
+            }
         }
     });
 	
     $(".mainBtn").mouseup(function () {
-        if ($(this).hasClass("warBtn")) {
-            $(this).attr('src', "img/warBtn.png");
+        if (sessionStorage.userId) {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtn.png");
+            }
+            else if ($(this).hasClass("IndexBtn")) {
+                $(this).attr('src', "img/mmBtn.png");
+            }
+        } else {
+            if ($(this).hasClass("warBtn")) {
+                $(this).attr('src', "img/warBtnGrey.png");
+            }
+            else if ($(this).hasClass("IndexBtn")) {
+                $(this).attr('src', "img/mmBtn.png");
+            }
         }
-        else if ($(this).hasClass("IndexBtn")) {
-            $(this).attr('src', "img/mmBtn.png");
-        }       
     });
         
     function loggedIn() {
             $('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
             $('#stateLoggedOut').hide();
             $('#stateLoggedIn').show();
+            $('#go_to_war').attr('src', 'img/warBtn.png');
             
         }
         function loggedOut() {
             $('#welcomeMessage').text("Login to access the game! Don't have an account? Register Now!");
             $('#stateLoggedOut').show();
             $('#stateLoggedIn').hide();
+            $('#go_to_war').attr('src', 'img/warBtnGrey.png');
         }
         function signOut() {
             sessionStorage.clear();
@@ -146,6 +168,6 @@
                 return false;
             }
         }
-		
+	// BILAL's BUTTON Edit ENDS 	
 	</script>
 </html>

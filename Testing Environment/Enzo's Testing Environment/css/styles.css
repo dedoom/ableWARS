@@ -45,6 +45,19 @@ html{
 	color: #030300;
 }
 
+#logo {
+    display: block;
+    margin: 0 auto;
+}
+#logo img {
+    position: relative;
+    display: block;
+    margin-left : auto;
+    margin-right : auto;
+    width: 500px
+}
+
+
 #instructions {
 	position: relative !important;
 }

@@ -1,0 +1,33 @@
+server listening on port \\.\pipe\cc6e6590-f966-48a3-98cc-8b7146e1f4a2
+client connected
+player1 socket client disconnected
+client connected
+player1 socket client disconnected
+client connected
+player1 socket client disconnected
+dbv connection openned
+200
+dbv connection opened: retrieving stats
+200
+1
+recordSetV7
+client connected
+player1 socket client disconnected
+inside post signIn
+db connection openned
+db connection closed
+200
+client connected
+player1 socket client disconnected
+client connected
+player1 socket client disconnected
+client connected
+player1 socket client disconnected
+dbv connection openned
+200
+dbv connection opened: retrieving stats
+200
+1
+recordSetV1
+client connected
+player1 socket client disconnected

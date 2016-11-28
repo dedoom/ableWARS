@@ -107,67 +107,69 @@
 		 	   
 		}
 		
-    // BILAL's BUTTON Edit: onclick -->
-	$(".mainBtn").mousedown(function () {
-        if (sessionStorage.userId) {
-            if ($(this).hasClass("warBtn")) {
-                $(this).attr('src', "img/warBtnClick.png");
-            }
-            else if ($(this).hasClass("IndexBtn")) {
-                $(this).attr('src', "img/mmBtnClick.png");
-            }
-        } else {
-            if ($(this).hasClass("warBtn")) {
-                $(this).attr('src', "img/warBtnClickGrey.png");
-            }
-            else if ($(this).hasClass("IndexBtn")) {
-                $(this).attr('src', "img/mmBtnClick.png");
-            }
-        }
-    });
-	
-    $(".mainBtn").mouseup(function () {
-        if (sessionStorage.userId) {
-            if ($(this).hasClass("warBtn")) {
-                $(this).attr('src', "img/warBtn.png");
-            }
-            else if ($(this).hasClass("IndexBtn")) {
-                $(this).attr('src', "img/mmBtn.png");
-            }
-        } else {
-            if ($(this).hasClass("warBtn")) {
-                $(this).attr('src', "img/warBtnGrey.png");
-            }
-            else if ($(this).hasClass("IndexBtn")) {
-                $(this).attr('src', "img/mmBtn.png");
-            }
-        }
-    });
-        
-    function loggedIn() {
-            $('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
-            $('#stateLoggedOut').hide();
-            $('#stateLoggedIn').show();
-            $('#go_to_war').attr('src', 'img/warBtn.png');
-            
-        }
-        function loggedOut() {
-            $('#welcomeMessage').text("Login to access the game! Don't have an account? Register Now!");
-            $('#stateLoggedOut').show();
-            $('#stateLoggedIn').hide();
-            $('#go_to_war').attr('src', 'img/warBtnGrey.png');
-        }
-        function signOut() {
-            sessionStorage.clear();
-            window.location.assign("/instructions.html");
-        }
-        function validate() {
-            if(sessionStorage.userId) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-	// BILAL's BUTTON Edit ENDS 	
+		// BILAL's BUTTON Edit: onclick -->
+		$(".mainBtn").mousedown(function () {
+			if (sessionStorage.userId) {
+				if ($(this).hasClass("warBtn")) {
+					$(this).attr('src', "img/warBtnClick.png");
+				}
+				else if ($(this).hasClass("IndexBtn")) {
+					$(this).attr('src', "img/mmBtnClick.png");
+				}
+			} else {
+				if ($(this).hasClass("warBtn")) {
+					$(this).attr('src', "img/warBtnClickGrey.png");
+				}
+				else if ($(this).hasClass("IndexBtn")) {
+					$(this).attr('src', "img/mmBtnClick.png");
+				}
+			}
+		});
+		
+		$(".mainBtn").mouseup(function () {
+			if (sessionStorage.userId) {
+				if ($(this).hasClass("warBtn")) {
+					$(this).attr('src', "img/warBtn.png");
+				}
+				else if ($(this).hasClass("IndexBtn")) {
+					$(this).attr('src', "img/mmBtn.png");
+				}
+			} else {
+				if ($(this).hasClass("warBtn")) {
+					$(this).attr('src', "img/warBtnGrey.png");
+				}
+				else if ($(this).hasClass("IndexBtn")) {
+					$(this).attr('src', "img/mmBtn.png");
+				}
+			}
+		});
+			
+		function loggedIn() {
+			$('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
+			$('#stateLoggedOut').hide();
+			$('#stateLoggedIn').show();
+			$('#go_to_war').attr('src', 'img/warBtn.png');
+		}
+
+		function loggedOut() {
+			$('#welcomeMessage').text("Login to access the game! Don't have an account? Register Now!");
+			$('#stateLoggedOut').show();
+			$('#stateLoggedIn').hide();
+			$('#go_to_war').attr('src', 'img/warBtnGrey.png');
+		}
+
+		function signOut() {
+			sessionStorage.clear();
+			window.location.assign("/instructions.html");
+		}
+
+		function validate() {
+			if(sessionStorage.userId) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		// BILAL's BUTTON Edit ENDS
 	</script>
 </html>

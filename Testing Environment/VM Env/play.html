@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <script src="javascript/jquery.js"></script> 
+        <script src="/socket.io/socket.io.js"></script>
+        <!--<script src="javascript/gameplay.js"></script>-->
+
+        <script>
+            var homePageURL = "/";
+			var ipAddress;
+            var socket = io.connect(homePageURL);
+            var points = 0;
+            var pointsToWin = 10;
+            var player = 0;
+			var team = 0;
+            var round = -1;
+			var timeRemaining = 60;
+			var shapeRequestInterval = 5;
+            var shapeImgs = ["Triangle_blue.png", "Rectangle_blue.png", "Circle_blue.png", "Triangle_yellow.png", "Rectangle_yellow.png", "Circle_yellow.png", "Triangle_red.png", "Rectangle_red.png", "Circle_red.png", "Triangle_green.png", "Rectangle_green.png", "Circle_green.png"];
+            var actions = ["TAP!", "TOUCH!", "SWIPE!", "HOLD!"];
+            var shapeWidthRatios = [2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1];
+			var matchID;
+			var interval1, interval2, interval4;
+			var firstSprite = 0;
+			var secondSprite = 0;
+			var playerID;
+			var browserWidth, browserHeight;
+			var lastPlayingFieldWidth, lastPlayingFieldHeight;
+			var shapeList = [];
+			var targetShape = 0;
+			var targetShapeLives;
+			var gameOverAnimCount = 0;
+			var endGameResult;
+			var waitingTagStrCount = 0;
+			var targetClicked = false;
+
+			
+            $(document).ready(function () {
+				//console.log("document.ready");
+                if (!sessionStorage.userId){
+					socket.disconnect();
+                    window.location.assign("/index.html");
+				}
+				//create an onClick event for each <div> in the playing field to remove itself and increment player
+				sizeComponentsToBrowser();
+				lastPlayingFieldWidth = $('#playingField').width();
+				lastPlayingFieldHeight = $('#playingField').height();
+                $("#playingField").on("mousedown", "div", function (event) {
+					if (targetClicked == true){
+						return;
+					}
+                    if (this.id === round + "shape" + targetShape) {
+                        var timestamp = Date.now();
+						var sID = this.id;
+						targetShapeLives--;
+						$("#targetLives").text(targetShapeLives);
+						if (targetShapeLives <= 0){
+							if (targetClicked == true){
+								return;
+							}
+							targetClicked = true;
+							socket.emit('targetShapeClick', { matchID: matchID, shapeID: sID });
+						}
+                    }
+					/*var timestamp = Date.now();
+					var sID = this.id;
+					$(this).remove();
+					socket.emit('shapeClick', { matchID: matchID, timeStamp: timestamp, shapeID: sID });*/
+                });
+            });
+			
+			$(window).on('hashchange', function(e){
+				socket.disconnect();
+			});
+			
+			$(window).resize(function(){
+				sizeComponentsToBrowser();
+			});
+			
+			function sizeComponentsToBrowser(){
+				browserWidth = $(window).width();
+				browserHeight = $(window).height();
+				//resize
+				//console.log("browserHeigth: " + browserHeight + "\ntimerHeight: " + parseInt($('#timer').outerHeight(true)) + "\nscoreBoardHeight: " + parseInt($('#scoreBoard').outerHeight(true))  + "\nplayerHeight: " + parseInt($('#team1').outerHeight(true)));
+				$('#timer').css('margin-top', parseInt($('#timer').css('margin-bottom')));
+				$('#playingField').css("height", browserHeight - (parseInt($('#timer').outerHeight(true)) * 3) - parseInt($('#team1').outerHeight(true)) - parseInt($('#scoreBoard').outerHeight(true)));
+				//console.log("playingField height: " + $('#playingField').height());
+				$('#timer').css('margin-top', parseInt($('#timer').height()) / 2);
+				repositionPlayers();
+				var shapes = $('#playingField').children();
+				var fieldDimension;
+				//console.log("playingField height: " + parseInt($('#playingField').height()) + "\nplayingField width: " + $('#playingField').width());
+				if ($('#playingField').height() < $('#playingField').width()){
+					fieldDimension = $('#playingField').height() / 5;
+					for (var s = 0; s < shapes.length; s++){
+						$(shapes[s]).css('height', parseFloat(shapes[s].getAttribute('data-hRatio')) * fieldDimension);
+						$(shapes[s]).children().css('height', $(shapes[s]).height());
+						//console.log("playingFieldHeight: " + $('#playingField').height() + "\nShapeHeightTarget: " + parseFloat(shapes[s].getAttribute('data-hRatio')) * ($('#playingField').height() / 5) + "\nShapeHeight: " + $(shapes[s]).height());
+						$(shapes[s]).css('width', $(shapes[s]).height() * shapeWidthRatios[shapes[s].getAttribute('data-picker')]);
+						$(shapes[s]).children().css('width', $(shapes[s]).width());
+					}
+				}
+				else {
+					fieldDimension = $('#playingField').width() / 5;
+					for (var s = 0; s < shapes.length; s++){
+						$(shapes[s]).css('width', parseFloat(shapes[s].getAttribute('data-wRatio')) * fieldDimension);
+						$(shapes[s]).children().css('width', $(shapes[s]).width());
+						//console.log("playingFieldHeight: " + $('#playingField').height() + "\nShapeHeightTarget: " + parseFloat(shapes[s].getAttribute('data-hRatio')) * ($('#playingField').height() / 5) + "\nShapeHeight: " + $(shapes[s]).height());
+						$(shapes[s]).css('height', $(shapes[s]).width() / shapeWidthRatios[shapes[s].getAttribute('data-picker')]);
+						$(shapes[s]).children().css('height', $(shapes[s]).height());
+					}
+				}
+				for (var s = 0; s < shapes.length; s++){
+					//shapes[s].setAttribute('data-hSpeed', shapes[s].getAttribute('data-hSpeedRatio') * ($('#playingField').width() / 200));
+					//shapes[s].setAttribute('data-vSpeed', shapes[s].getAttribute('data-vSpeedRatio') * ($('#playingField').height() / 200));
+					//playingField w/h  /  last playingField w/h  *  shapes' x/y
+					//console.log("playingField width: " + $('#playingField').width() + "\nlast playingField width: " + lastPlayingFieldWidth + "\nratio: " + ($('#playingField').width() / lastPlayingFieldWidth));
+					//console.log("shapeLeftPercent: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) + "\nshape's left: " + $(shapes[s]).css('left') + "\nshape's new left: " + (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
+					$(shapes[s]).css('left', (parseInt($(shapes[s]).css('left')) / lastPlayingFieldWidth) * $('#playingField').width());
+					$(shapes[s]).css('top', (parseInt($(shapes[s]).css('top')) / lastPlayingFieldHeight) * $('#playingField').height());
+				}
+				lastPlayingFieldWidth = $('#playingField').width();
+				lastPlayingFieldHeight = $('#playingField').height();
+			}
+
+			socket.on('connect', function(){
+				//console.log("socket.on('connect')");
+				socket.on('disconnect', function(){
+					alert("You have been disconnected from the server.");
+					window.location.replace(homePageURL);
+				});
+			});
+			
+			function appendWaitingTag(){
+				waitingTagStrCount++;
+				waitingTagStrCount = waitingTagStrCount % 5;
+				var waitingTagStr = "Waiting for other players"
+				var waitingDots = "";
+				for (var i = 0; i < waitingTagStrCount; i++){
+					waitingDots = waitingDots + ".";
+				}
+				$('#playingField').empty();
+				//console.log(waitingTagStrCount);
+				$('#playingField').append("<p style='display:block' id='waitingTag'>" + waitingTagStr + "</br>" + waitingDots + "</p>");
+			}
+			
+            socket.on('startGame', function (data) {
+				//console.log("socket.on('startGame')");
+				$('#playingField').empty();
+				clearInterval(interval1);
+                counter = 3;
+                matchID = data['matchID'];
+				console.log("matchID " + matchID);
+				playerID = data['playerID'];
+				console.log("playerID " + playerID);
+				//alert("Match #: " + matchID + "\nPlayer: " + player);
+				while(Date.now() < data['startTime']){
+					if (Date.now() % 1000 == 0)
+					console.log("current time: " + Date.now() + " data['startTime'] " + data['startTime']);
+				}
+				console.log("socket.on('startGame')7");
+                interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
+				console.log("socket.on('startGame')8");
+            });
+
+			socket.on('teamNum', function(data){
+				team = data;
+				//console.log(team);
+				$('#teamNum').text(team);
+			});
+			
+			socket.on('playerNum', function(data){
+				player = data;
+				//console.log(player);
+				$('#playerNum').text(player);
+				clearInterval(interval1);
+				interval1 = setInterval(function(){ appendWaitingTag() }, 500);
+			});
+			
+            function startInterval(shapes) {
+                counter--;
+
+                if (counter != 0) {
+                    $("#timer").text(counter);
+                }
+                else {
+                    $("#timer").text("Go!");
+                    clearInterval(interval1);
+                  //  setTargetShape(shapeImgs); //Nov 12, 2016
+                    newShapes(shapes);
+                    interval2 = setInterval(function (){ countDown() }, 1000);
+					interval1 = setInterval(function (){ moveShapes() }, 50);
+					interval4 = setInterval(function(){ movePlayerImg() }, 100);
+                }
+            }
+			
+			function movePlayerImg(){
+                firstSprite++;
+				secondSprite++;
+                if(firstSprite == 9)
+                    firstSprite = 0;
+				if(secondSprite == 8)
+					secondSprite =0;
+                var imgString1 = "url(../img/ninja/Run__00" + firstSprite + "p1.png)";
+                var imgString2 = "url(../img/robot/Run__00" + secondSprite + "p1.png)";
+                $("#team1").css("background-image", imgString1);
+                $("#team2").css("background-image", imgString2);
+            }
+			
+			function countDown(){
+				timeRemaining--;
+				$("#timer").text(timeRemaining);
+				if (timeRemaining <= 0){
+					$("#timer").text("Times Up");
+					clearInterval(interval2);
+					clearInterval(interval1);
+					clearInterval(interval4);
+					//clearScreen();
+					socket.emit('timeUp', { matchID: matchID, score: points, playerNum: player });
+				}
+				/*else if (timeRemaining % shapeRequestInterval == 0){
+					//console.log(timeRemaining + "\n" + timeRemaining % shapeRequestInterval);
+					socket.emit('shapesRequest');
+				}*/
+			}
+
+            socket.on('newShapes', function (shapes) {
+				if (points >= 10 || points <= -10){
+					return;
+				}
+				targetClicked = false;
+				$("#playingField").empty();
+				newShapes(shapes);
+            });
+
+			socket.on('newTargetShapeLives', function(targetLives){
+				targetShapeLives = targetLives;
+				//console.log("tsl: " + targetShapeLives);
+				$("#targetLives").text(targetShapeLives);
+			});
+			
+			/*function clearScreen(){
+				$("#playingField").empty();
+			}*/
+
+			function setTargetShape(shapes) {
+				//console.log(targetShape);
+			    $("#targetShape").empty();
+			    $("#targetShape").append("<div style='display:block' class='shapeTarget' ><img  src='../img/shapes/" + shapeImgs[shapes[targetShape]['picker']] + "'></div>");
+			}
+
+            function newShapes(shapes) {
+				//shapeList.push(shapes);
+				setTargetShape(shapes);
+                round++;
+                for (i = 0; i < shapes.length; i++) {
+					var shapeID = "" + round + "shape" + i;
+					//console.log("round: " + round + "\ni: " + i + "\nshapeID: " + shapeID);
+					var hSpeed = Math.floor(($('#playingField').width() / 300) + (Math.random() * ($('#playingField').width() / 300)));
+					if (Math.round(Math.random())){
+						hSpeed *= -1;
+					}
+					var vSpeed = Math.floor(($('#playingField').height() / 150) + (Math.random() * ($('#playingField').height() / 150)));
+                    if (Math.round(Math.random())){
+						vSpeed *= -1;
+					}
+					var heightRatio = shapes[i]['height'] / 150;
+					var widthRatio = (shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']]) / 150;
+					var hSpeedRatio = hSpeed / ($('#playingField').width() / 200);
+					var vSpeedRatio = vSpeed / ($('#playingField').height() / 200);
+					$("#playingField").append("<div style='display:block' class='shape' id ='" + shapeID + "' data-hSpeed='" + hSpeed + "' data-vSpeed='" + vSpeed + "' data-hRatio='" + heightRatio + "' data-wRatio='" + widthRatio + "' data-hSpeedRatio='" + hSpeedRatio + "' data-vSpeedRatio='" + vSpeedRatio + "' data-picker='" + shapes[i]['picker'] + "'><img class='shapeInPlay' src='../img/shapes/" + shapeImgs[shapes[i]['picker']] + "'></div>");
+					//console.log(document.getElementById(shapeID).getAttribute('data-hRatio'));
+                    var randPosX = Math.floor(Math.random() * ($("#playingField").width() - (shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']])));
+                    var randPosY = Math.floor(Math.random() * ($("#playingField").height() - shapes[i]['height']));
+
+                    $("#" + round + "shape" + i).css("width", shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']]);
+                    $("#" + round + "shape" + i).css("height", shapes[i]['height']);
+                    $("#" + round + "shape" + i).children().css("width", shapes[i]['height'] * shapeWidthRatios[shapes[i]['picker']]);
+                    $("#" + round + "shape" + i).children().css("height", shapes[i]['height']);
+                    $("#" + round + "shape" + i).css('left', randPosX);
+                    $("#" + round + "shape" + i).css('top', randPosY);
+                }
+				sizeComponentsToBrowser();
+            }
+			
+			function moveShapes(){
+				var shapes = $('#playingField').children();
+				for (var i = 0; i < shapes.length; i++){
+					//console.log($(shapes[i]).id + "\n" + $(shapes[i]).css('left') + "\n" + $(shapes[i]).css('top'));
+					if (parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')) < 0){
+						$(shapes[i]).css('left', 0);
+						shapes[i].setAttribute('data-hSpeed', -1 * parseInt(shapes[i].getAttribute('data-hSpeed')));
+					}
+					else if (parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')) > $('#playingField').width() - parseInt($(shapes[i]).css('width'))){
+						$(shapes[i]).css('left', $('#playingField').width() - parseInt($(shapes[i]).css('width')));
+						shapes[i].setAttribute('data-hSpeed', -1 * parseInt(shapes[i].getAttribute('data-hSpeed')));
+					}
+					if (parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')) < 0){
+						$(shapes[i]).css('top', 0);
+						shapes[i].setAttribute('data-vSpeed', -1 * parseInt(shapes[i].getAttribute('data-vSpeed')));
+					}
+					else if (parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')) > $('#playingField').height() - parseInt($(shapes[i]).css('height'))){
+						$(shapes[i]).css('top', $('#playingField').height() - parseInt($(shapes[i]).css('height')));
+						shapes[i].setAttribute('data-vSpeed', -1 * parseInt(shapes[i].getAttribute('data-vSpeed')));
+					}
+					
+					//console.log(parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')));
+					$(shapes[i]).css('left', parseInt($(shapes[i]).css('left')) + parseInt(shapes[i].getAttribute('data-hSpeed')));
+					$(shapes[i]).css('top', parseInt($(shapes[i]).css('top')) + parseInt(shapes[i].getAttribute('data-vSpeed')));
+				}
+			}
+
+            socket.on('point', function () {
+                points++;
+                repositionPlayers();
+                if (points == pointsToWin) {
+                    socket.emit('win', { matchID: matchID, playerNum: player });
+                }
+            });
+			
+            socket.on('losePoint', function (/*shapeID*/) {
+                //removeShape(shapeID);
+				points--;
+                repositionPlayers();
+            });
+			
+			function removeShape(shape){
+				if (gameOverAnimCount >= $('#playingField').children().length){
+					clearInterval(interval1);
+				}
+				//interval2 = setInterval(function(){fadeOutShape(shape)}, 10);
+			}
+
+            function repositionPlayers() {
+                //console.log(browserWidth);
+				if (team == 1) {
+					//console.log("browserWidth: " + browserWidth + "\npos by points: " + ((browserWidth / (pointsToWin * 4)) * points) + "\nposition" + parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points)));
+                    //var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#team1').width()) / 2));
+					var left = parseInt((browserWidth / 4) - ((browserWidth / (pointsToWin * 4)) * points));
+                    $("#team1").css('left', left);
+                    $("#team2").css('left', left + (browserWidth / 2) - parseInt($('#team1').width()));
+					$('#rope').css('left', left + parseInt($('#team1').width()) / 2);
+					$('#rope').css('width', parseInt($("#team2").css('left')) - parseInt($("#team1").css('left')));
+                }
+                else {
+                    //var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - (parseInt($('#team2').width()) / 2));
+					var left = parseInt(((browserWidth / 4) * 3) + ((browserWidth / (pointsToWin * 4)) * points) - parseInt($('#team2').width()));
+                    $("#team2").css('left', left);
+                    $("#team1").css('left', left - (browserWidth / 2) + parseInt($('#team2').width()));
+					$('#rope').css('left', parseInt($("#team1").css('left')) + parseInt($('#team1').width()) / 2);
+					$('#rope').css('width', parseInt($("#team2").css('left')) - parseInt($("#team1").css('left')));
+                }
+            }
+
+            socket.on('win', function () {
+				//alert("You win!!");
+				endGameResult = "win";
+				gameOver();
+            });
+
+            socket.on('winByDisconnect', function(){
+				//alert("Your opponent has disconnected from the match.\nYou win!!");
+				endGameResult = "winDisconnect";
+				gameOver();
+			});
+			
+			socket.on('loseByTeamDisconnect', function(){
+				//alert("Your teammate has disconnected from the match.\nYou lose :(");
+				endGameResult = "loseDisconnect";
+				gameOver();
+			});
+			
+			socket.on('lose', function () {
+				//alert("You lost :(");
+				endGameResult = "lose";
+				gameOver();
+            });
+			
+			socket.on('tie', function(){
+				//alert("You've tied with your opponent.");
+				endGameResult = "tie";
+				gameOver();
+			});
+			
+			function gameOver(){
+				clearInterval(interval1);
+				clearInterval(interval2);
+				clearInterval(interval4);
+				$('#timer').text("GameOver!");
+				
+				recordStats();
+				
+				var shapeDivs = $('#playingField').children();
+				interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
+			}
+			
+			function getStats(){
+				console.log("step3");
+				var user = {
+					username : sessionStorage.userId
+				};
+				var jsonUser = JSON.stringify(user);
+				$.ajax({
+					url : '/getStats',
+					type : 'POST',
+					data : jsonUser,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(result) {
+						console.log(result['gamesPlayed']);
+						var newStats = {
+							username : sessionStorage.userId,
+							gamesPlayed : parseInt(result['gamesPlayed']),
+							wins : parseInt(result['wins']),
+							losses : parseInt(result['losses']),
+							fastestWin : parseInt(result['fastestWin']),
+							highScore : parseInt(result['highestScore'])
+						};
+						newStats['gamesPlayed'] = newStats['gamesPlayed'] + 1;
+						if (endGameResult == "win" || endGameResult == "winDisconnect"){
+							newStats['wins'] = newStats['wins'] + 1;
+						}
+						else if (endGameResult == "lose" || endGameResult == "loseDisconnect") {
+							newStats['losses'] = newStats['losses'] + 1;
+						}
+						if (60 - timeRemaining < newStats['fastestWin'] || newStats['fastestWin'] == 0){
+							newStats['fastestWin'] = 60 - timeRemaining;
+						}
+						if (points > newStats['highScore']){
+							newStats['highScore'] = points;
+						}
+						//console.log(newStats['username'] + " : " + newStats['gamesPlayed'] + " : " + newStats['wins'] + " : " + newStats['losses'] + " : " + newStats['fastestWin'] + " : " + newStats['highScore']);
+						updateStats(newStats);
+					},
+					error : function(jqXHR, textStatus, err) {
+						alert('text status '+textStatus+', err '+err);
+					}
+				});
+			}
+			
+			function updateStats(newStats){
+				var jsonStats = JSON.stringify(newStats);
+				
+				$.ajax({
+					url : '/updateStats',
+					type : 'POST',
+					data : jsonStats,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(result) {
+						console.log("Successfully updated stats");
+					},
+					error : function(jqXHR, textStatus, err) {
+						alert('text status '+textStatus+', err '+err);
+					}
+				});
+			}
+			
+			function recordStats(){
+				console.log("step1");
+				var userValidate = {
+					username : sessionStorage.userId
+				};
+				var jsonValidate = JSON.stringify(userValidate);
+				$.ajax({
+					url : '/usernameValidation',
+					type : 'POST',
+					data : jsonValidate,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(result) {
+						if (result == "200") {
+							console.log("step2");
+							return getStats();
+						} else {
+							alert("User could not be found.");
+							window.location.assign("/index.html");
+						}
+					},
+					error : function(jqXHR, textStatus, err) {
+						alert('text status '+textStatus+', err '+err);
+					}
+				});
+			}
+			
+			function fadeOutShape(shape){
+				$(shape).css('height', parseInt($(shape).css('height')) - 2);
+				$(shape).children().css('height', $(shape).height());
+				$(shape).css('width', $(shape).height() * shapeWidthRatios[shape.getAttribute('data-picker')]);
+				$(shape).children().css('width', $(shape).width());
+				if (parseInt($(shape).css('height')) <= 0){
+					clearInterval(interval1);
+					$(shape).remove();
+					console.log($('#playingField').children().length);
+					if ($('#playingField').children().length <= 0){
+						displayEndScreen();
+					}
+					else {
+						var shapeDivs = $('#playingField').children();
+						interval1 = setInterval(function(){ fadeOutShape(shapeDivs[$('#playingField').children().length - 1]) }, 10);
+					}
+				}
+			}
+			
+			function displayEndScreen(){
+				
+				//alert(endGameResult);
+				//window.location.replace(homePageURL);
+				$('#playingField').empty();
+				//console.log(waitingTagStrCount);
+				
+				if (endGameResult == "win"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundWin'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("winBackgroundGradient");
+					$("#playingField").append("<div class='endGameResultMessage'>Win</div>");
+				}
+				else if (endGameResult == "lose"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundLose'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("loseBackgroundGradient");
+					$("#playingField").append("<div class='endGameResultMessage'>Lose</div>");
+				}
+				else if (endGameResult == "tie"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundTie'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("tieBackgroundGradient");
+					$("#playingField").append("<div class='endGameResultMessage'>Tie</div>");
+				}
+				else if (endGameResult == "winDisconnect"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundWin'/>");
+					$('#playingField').removeClass("playingFieldGameBackground");
+					$('#playingField').addClass("winBackgroundGradient");
+					$("#playingField").append("<div class='disconnectMessage' id='disconnectMessage'>Your opponent has disconnected from the match</div>");
+					interval1 = setInterval(function(){ fadeDisconnectMessage() }, 100);
+					$("#playingField").append("<div class='endGameResultMessage'>Win</div>");
+				}
+				else if (endGameResult == "loseDisconnect"){
+					//$('#playingField').append("<img class='endGameBackground' src='img/endGameBackgroundLose'/>");
+					$('#playingField').addClass("loseBackgroundGradient");
+					$("#playingField").append("<div class='disconnectMessage' id='disconnectMessage'>Your teammate has disconnected from the match</div>");
+					interval1 = setInterval(function(){ fadeDisconnectMessage() }, 100);
+					$("#playingField").append("<div class='endGameResultMessage'>Lose</div>");
+				}
+				
+				
+				$("#playingField").append("<div class='endGameInfo'>Time Remaining: " + timeRemaining + "</div>");
+				var finalPoints = points;
+				if (points <= 0){
+					finalPoints = 0;
+				}
+				$("#playingField").append("<div class='endGameInfo'>Final Score: " + finalPoints + "</div>");
+				
+				$("#playingField").append("<div class='endGameButtons' id='endGameButtons'></div>");
+				$("#endGameButtons").append("<a href='play.html'><button class='endGameBtn'>Play again</button></a>");
+				$("#endGameButtons").append("<a href='index.html'><button class='endGameBtn'>Return to main menu</button></a>");
+			}
+			
+			var opacity = 2.0;
+			function fadeDisconnectMessage(){
+				opacity = opacity - 0.1;
+				$("#disconnectMessage").css('opacity', opacity);
+				if (opacity <= 0){
+					$("#disconnectMessage").remove();
+					clearInterval(interval1);
+				}
+			}
+			
+			/*socket.on('updatematchID', function(newmatchID){
+				matchID = newmatchID;
+			});*/
+			
+			
+        </script>
+        
+        <link rel="StyleSheet" href="css/styles.css" />
+    </head>
+    <body>
+        <div id="gameHeader">
+        <!--    <p style="text-align:center">Target: </p>
+          <div id="targetShape">
+              
+          </div>
+            <p style="text-align:center">Time: </p>
+          <p id="timer">3</p>-->
+
+        <table style="margin:0 auto">
+				<tr><th>Team: </th><td id="teamNum"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Player: </th><td id="playerNum"></td></tr>
+                <tr><th>Timer: </th><td id="timer">3</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target: </th><td id="targetShape"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><th>Target Lives: </th><td id="targetLives"></td></tr>
+            </table>
+            </div>
+          
+
+        <div class="playingFieldGameBackground" id="playingField"></div>
+        <div id="scoreBoard">
+		<div class="mudInMiddle"><img src="../img/mud.png"/></div>
+            <div class="team" id="team1">Team 1</div>
+            <div class="team" id="team2">Team 2</div>
+			<div id="rope"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <script src="javascript/jquery.js"></script> 
+        <!--<script src="javascript/gameplay.js"></script>-->
+        <link rel="StyleSheet" href="css/styles.css" />
+    </head>
+    <body>
+        <div id="SISOButtons">
+        <label id="welcomeMessage">Login to access the game! Don't have an account? Register Now!</label>
+        <div class="btnContainer" id="stateLoggedOut">
+            <a href="login.html"><div class="accBtn" id="logInButton">Log In</div></a>
+            <a href="Registration.html"><div class="accBtn" id="registerButton">Register</div></a>
+        </div>
+        <div class="btnContainer" id="stateLoggedIn">
+            <div class="accBtn" id="logoutButton" onclick="signOut()">Sign Out</div>
+        </div>
+    </div>
+        <br /><br /><br /><br />
+        <div id="able_wars_">How To Play</div>
+        </br>
+		<div class="instructionBox">
+			<div class="instructionsButtonsContainer">
+				<button class="instructionsNextBackBtn" id="instructionsBackBtn" onclick="instructionsBack()">Back</button>
+				<button class="instructionsNextBackBtn" id="instructionsNextBtn" onclick="instructionsNext()">Next</button>
+			</div>
+			<div id="HowToPlay">
+				<p class="instructionsText" id="instruction1">ABLE WARS is a team based competition game. You and your team must work together against the opposing team to help keep your champion out of the mud,
+					while trying to put your opponent's competitor in to it. Every point you score for you team brings you one step closer to victory, and your opponent on step closer
+					to the MUD!</p>
+				<img class="instructionsImg" id="instructionImg1" src="img/Logo.png"/>
+				<p class="instructionsText" id="instruction2">When your game begins, several moving shapes will be placed in the playing field, Your first target shape will be displayed above the playing 
+					field, and the target shape will have a given number of lives shown beside it.</p>
+				<img class="instructionsImg" id="instructionImg2" src="img/instructions/instructionImg1.png"/>
+				<p class="instructionsText" id="instruction3">You must attempt to tap the target shape as many times as it has lives before a player on the opposing team does the same. If you succeed at this, 
+					you will score a point for your team and knock your opponent down a peg.</p>
+				<img class="instructionsImg" id="instructionImg3" src="img/instructions/instructionImg2.png"/>
+				<p class="instructionsText" id="instruction4">There are two ways to win the game, you can either have the most points than the opposing team when the time runs out or pull the other team into the mud and prove your GREATNESS!</p>
+				<img class="instructionsImg" id="instructionImg4" src="img/instructions/instructionImg3.png"/>
+				<div class="spacer" style="clear: both;"></div>
+			</div>
+		</div>
+		</br>
+		<div id="artboard_1">
+            <a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png"/></a>
+            <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png"/></a>
+        </div>
+		</br></br>
+    </body>
+	
+	<script>
+		var browserWidth, browserHeight;
+		var instruction = 1;
+		
+		$(document).ready(function(){
+            if (sessionStorage.userId) {
+                loggedIn();
+            } else {
+                loggedOut();
+            }
+            
+			sizeComponentsToBrowser();
+			$('#instructionsBackBtn').prop('disabled', true);
+			$('#instruction2').css('display', 'none');
+			$('#instruction3').css('display', 'none');
+			$('#instruction4').css('display', 'none');
+			$('#instructionImg2').css('display', 'none');
+			$('#instructionImg3').css('display', 'none');
+			$('#instructionImg4').css('display', 'none');
+		});
+		
+		$(window).resize(function(){
+			sizeComponentsToBrowser();
+		});
+		
+		function instructionsBack(){
+			if (instruction == 1){
+				return;
+			}
+			$('#instructionsNextBtn').prop('disabled', false);
+			$('#instruction' + instruction).css('display', 'none');
+			$('#instructionImg' + instruction).css('display', 'none');
+			instruction--;
+			$('#instruction' + instruction).css('display', 'block');
+			$('#instructionImg' + instruction).css('display', 'block');
+			if (instruction == 1){
+				$('#instructionsBackBtn').prop('disabled', true);
+			}
+		}
+		
+		function instructionsNext(){
+			if (instruction == 4){
+				return;
+			}
+			$('#instructionsBackBtn').prop('disabled', false);
+			$('#instruction' + instruction).css('display', 'none');
+			$('#instructionImg' + instruction).css('display', 'none');
+			instruction++;
+			$('#instruction' + instruction).css('display', 'block');
+			$('#instructionImg' + instruction).css('display', 'block');
+			if (instruction == 4){
+				$('#instructionsNextBtn').prop('disabled', true);
+			}
+		}
+		
+		function sizeComponentsToBrowser() {
+		    browserWidth = $(window).width();
+		    browserHeight = $(window).height();
+		   
+		    $('#able_wars_').width(browserWidth * 0.7);
+		    $('#able_wars_').css('margin-left', browserWidth * 0.15);
+		    $('#able_wars_').css('margin-top', parseFloat($('#able_wars_').height()) / 8);
+		    $('#able_wars_').css('margin-bottom', parseFloat($('#able_wars_').height()) / 8);
+		    $('#able_wars_').css('font-size', $('#able_wars_').height() * 0.9);
+            
+
+		    $('#go_to_war').css('width', browserWidth / 3);
+		    $('#go_to_war').css('margin-left', browserWidth / 3);
+		    $('#go_to_war').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
+		    $('#go_to_war').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
+
+		    $('#go_to_menu').css('width', browserWidth / 3);
+		    $('#go_to_menu').css('margin-left', browserWidth / 3);
+		    $('#go_to_menu').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
+		    $('#go_to_menu').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
+		}
+		
+		$(".mainBtn").mousedown(function () { 
+			if (!sessionStorage.userId)
+				return;
+			if ($(this).hasClass("warBtn")) {
+				$(this).attr('src', "img/warBtnClick.png");
+			}
+			else if ($(this).hasClass("IndexBtn")) {
+				$(this).attr('src', "img/mmBtnClick.png");
+			}
+		});
+		
+		$(".mainBtn").mouseup(function () {
+			if (!sessionStorage.userId)
+				return;
+			if ($(this).hasClass("warBtn")) {
+				$(this).attr('src', "img/warBtn.png");
+			}
+			else if ($(this).hasClass("IndexBtn")) {
+				$(this).attr('src', "img/mmBtn.png");
+			}       
+		});
+			
+		function loggedIn() {
+			$('#welcomeMessage').text("Welcome " + sessionStorage.userId + " !");
+			$('#stateLoggedOut').hide();
+			$('#stateLoggedIn').show();
+			$('#go_to_war').attr('src', 'img/warBtn.png');
+		}
+		
+		function loggedOut() {
+			$('#welcomeMessage').text("Login to access the game! Don't have an account? Register Now!");
+			$('#stateLoggedOut').show();
+			$('#stateLoggedIn').hide();
+			$('#go_to_war').attr('src', 'img/warBtnGrey.png');
+		}
+		
+		function signOut() {
+			sessionStorage.clear();
+			window.location.assign("/instructions.html");
+		}
+		
+		function validate() {
+			if(sessionStorage.userId) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	</script>
+</html>

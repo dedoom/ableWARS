@@ -54,6 +54,10 @@ html{
 	position: relative !important;
 }
 
+#go_to_leaderboard {
+	position: relative !important;
+}
+
 #waitingTag{
 	height: 100%;
 	width: 100%;

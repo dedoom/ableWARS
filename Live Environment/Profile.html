@@ -33,6 +33,7 @@
 
         <a href="play.html"><img class="mainBtn warBtn" id="go_to_war" src="img/warBtn.png" /></a>
         <a href="Index.html"><img class="mainBtn IndexBtn" id="go_to_menu" src="img/mmBtn.png" /></a>
+		<a href="https://142.55.32.86:50122/AWStats"><img class="mainBtn LeaderboardBtn" id="go_to_leaderboard" src="img/leaderboardBtn.png" /></a>
     </div>
     </br>
 </body>
@@ -137,6 +138,11 @@
 		$('#go_to_menu').css('margin-left', browserWidth / 3);
 		$('#go_to_menu').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
 		$('#go_to_menu').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
+		
+		$('#go_to_leaderboard').css('width', browserWidth / 3);
+		$('#go_to_leaderboard').css('margin-left', browserWidth / 3);
+		$('#go_to_leaderboard').css('height', parseFloat($('#go_to_war').css('width')) / 5.34);
+		$('#go_to_leaderboard').css('margin-top', parseFloat($('#go_to_war').css('height')) * 0.5);
 	}
 
 	$(".mainBtn").mousedown(function () {   
@@ -146,6 +152,9 @@
         else if ($(this).hasClass("IndexBtn")) {
             $(this).attr('src', "img/mmBtnClick.png");
         }
+		else if ($(this).hasClass("LeaderboardBtn")) {
+            $(this).attr('src', "img/leaderboardBtnClick.png");
+        }
     });
 	
     $(".mainBtn").mouseup(function () {
@@ -154,7 +163,10 @@
         }
         else if ($(this).hasClass("IndexBtn")) {
             $(this).attr('src', "img/mmBtn.png");
-        }       
+        } 
+		else if ($(this).hasClass("LeaderboardBtn")) {
+            $(this).attr('src', "img/leaderboardBtn.png");
+        }		
     })
 
     function signOut() {

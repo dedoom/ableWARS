@@ -10,7 +10,7 @@
         <script>
             var homePageURL = "/";
 			var ipAddress;
-            var socket = io.connect(homePageURL);
+            var socket = io.connect(homePageURL);;
             var points = 0;
             var pointsToWin = 10;
             var player = 0;
@@ -146,23 +146,39 @@
 				$('#playingField').append("<p style='display:block' id='waitingTag'>" + waitingTagStr + "</br>" + waitingDots + "</p>");
 			}
 			
+			function appendStartingTag(){
+				startingTagStrCount++;
+				startingTagStrCount = startingTagStrCount % 5;
+				var startingTagStr = "Starting Match"
+				var startingDots = "";
+				for (var i = 0; i < startingTagStrCount; i++){
+					startingDots = startingDots + ".";
+				}
+				$('#playingField').empty();
+				//console.log(waitingTagStrCount);
+				$('#playingField').append("<p style='display:block' id='waitingTag'>" + startingTagStr + "</br>" + startingDots + "</p>");
+			}
+			
             socket.on('startGame', function (data) {
 				//console.log("socket.on('startGame')");
 				$('#playingField').empty();
 				clearInterval(interval1);
+				interval1 = setInterval(function(){ appendStartingTag() }, 500);
                 counter = 3;
                 matchID = data['matchID'];
-				console.log("matchID " + matchID);
+				//console.log("matchID " + matchID);
 				playerID = data['playerID'];
-				console.log("playerID " + playerID);
+				//console.log("playerID " + playerID);
 				//alert("Match #: " + matchID + "\nPlayer: " + player);
 				while(Date.now() < data['startTime']){
-					if (Date.now() % 1000 == 0)
-					console.log("current time: " + Date.now() + " data['startTime'] " + data['startTime']);
+					/*if (Date.now() % 1000 == 0){
+						console.log("current time: " + Date.now() + " data['startTime'] " + data['startTime']);
+					}*/
 				}
-				console.log("socket.on('startGame')7");
+				clearInterval(interval1);
+				//console.log("socket.on('startGame')7");
                 interval1 = setInterval(function () { startInterval(data['shapes']) }, 1000);
-				console.log("socket.on('startGame')8");
+				//console.log("socket.on('startGame')8");
             });
 
 			socket.on('teamNum', function(data){
@@ -397,7 +413,7 @@
 			}
 			
 			function getStats(){
-				console.log("step3");
+				//console.log("step3");
 				var user = {
 					username : sessionStorage.userId
 				};
@@ -409,7 +425,7 @@
 					contentType : 'application/json',
 					dataType : 'json',
 					success : function(result) {
-						console.log(result['gamesPlayed']);
+						//console.log(result['gamesPlayed']);
 						var newStats = {
 							username : sessionStorage.userId,
 							gamesPlayed : parseInt(result['gamesPlayed']),
@@ -435,7 +451,7 @@
 						updateStats(newStats);
 					},
 					error : function(jqXHR, textStatus, err) {
-						alert('text status '+textStatus+', err '+err);
+						alert('Error: There was an error retrieving match statistics\nError coding: ' + textStatus + ', err ' + err);
 					}
 				});
 			}
@@ -450,16 +466,16 @@
 					contentType : 'application/json',
 					dataType : 'json',
 					success : function(result) {
-						console.log("Successfully updated stats");
+						//console.log("Successfully updated stats");
 					},
 					error : function(jqXHR, textStatus, err) {
-						alert('text status '+textStatus+', err '+err);
+						alert('Error: There was an error recording match statistics\nError coding: ' + textStatus + ', err ' + err);
 					}
 				});
 			}
 			
 			function recordStats(){
-				console.log("step1");
+				//console.log("step1");
 				var userValidate = {
 					username : sessionStorage.userId
 				};
@@ -472,15 +488,15 @@
 					dataType : 'json',
 					success : function(result) {
 						if (result == "200") {
-							console.log("step2");
+							//console.log("step2");
 							return getStats();
 						} else {
-							alert("User could not be found.");
+							alert("User not found while recording match statistics.");
 							window.location.assign("/index.html");
 						}
 					},
 					error : function(jqXHR, textStatus, err) {
-						alert('text status '+textStatus+', err '+err);
+						alert('Error: There was an error attempting to validate user\nError coding: '+textStatus+', err '+err);
 					}
 				});
 			}
@@ -493,7 +509,7 @@
 				if (parseInt($(shape).css('height')) <= 0){
 					clearInterval(interval1);
 					$(shape).remove();
-					console.log($('#playingField').children().length);
+					//console.log($('#playingField').children().length);
 					if ($('#playingField').children().length <= 0){
 						displayEndScreen();
 					}

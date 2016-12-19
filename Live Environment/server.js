@@ -140,14 +140,14 @@ io.on('connection', function (socket) {
 				player1Socket = player2Socket;
 				player2Socket = null;
 				player1Socket.emit('playerNum', 1);
-				socket.emit('teamNum', 1);
+				player1Socket.emit('teamNum', 1);
 			}
 			if (player3Socket != null){
 				console.log("player 3 pushed to player 2");
 				player2Socket = player3Socket;
 				player3Socket = null;
 				player2Socket.emit('playerNum', 2);
-				socket.emit('teamNum', 2);
+				player2Socket.emit('teamNum', 2);
 			}
 			numOfClientsQueued--;
 		}
@@ -159,7 +159,7 @@ io.on('connection', function (socket) {
 				player2Socket = player3Socket;
 				player3Socket = null;
 				player2Socket.emit('playerNum', 2);
-				socket.emit('teamNum', 2);
+				player2Socket.emit('teamNum', 2);
 			}
 			numOfClientsQueued--;
 		}
